@@ -4,9 +4,7 @@ import {
   AlertTriangle, 
   Clock, 
   Package, 
-  Users, 
   ArrowUpRight,
-  ShieldAlert,
   ChevronRight
 } from 'lucide-react';
 import api from '../services/api';
@@ -19,28 +17,58 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigateTab }) => {
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchSummary = async () => {
       try {
+        setFetchError(null);
         const res = await api.get('/reports/summary');
-        if (res.data.success) {
+        if (isMounted && res.data.success) {
           setSummary(res.data.data);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('Failed to load dashboard summary:', err);
+        if (isMounted) {
+          setFetchError(err.response?.data?.message || err.message || 'Unable to connect to server');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchSummary();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-96">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600"></div>
+      <div className="flex flex-col items-center justify-center h-96 space-y-3">
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-600"></div>
+        <p className="text-xs text-slate-500 font-medium">Loading pharmacy operations dashboard...</p>
+      </div>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <div className="p-6 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 space-y-3">
+        <div className="flex items-center space-x-2 font-bold text-sm">
+          <AlertTriangle className="w-5 h-5 text-rose-600" />
+          <span>Error loading dashboard metrics</span>
+        </div>
+        <p className="text-xs text-rose-600">{fetchError}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded text-xs font-semibold"
+        >
+          Retry
+        </button>
       </div>
     );
   }
@@ -59,10 +87,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateTab }) => {
           </div>
           <div>
             <div className="text-2xl font-bold text-slate-800">
-              ₹{summary?.todayRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2 }) || '0.00'}
+              ₹{(summary?.todayRevenue ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
             </div>
             <p className="text-xs text-slate-500 mt-1">
-              {summary?.todaySalesCount || 0} transactions completed today
+              {summary?.todaySalesCount ?? 0} transactions completed today
             </p>
           </div>
         </div>
@@ -77,7 +105,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateTab }) => {
           </div>
           <div>
             <div className="text-2xl font-bold text-slate-800">
-              {summary?.totalMedicinesCount || 0}
+              {summary?.totalMedicinesCount ?? 0}
             </div>
             <p className="text-xs text-slate-500 mt-1">
               Active SKU items in catalog
@@ -98,7 +126,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateTab }) => {
           </div>
           <div>
             <div className="text-2xl font-bold text-amber-600">
-              {summary?.lowStockCount || 0}
+              {summary?.lowStockCount ?? 0}
             </div>
             <p className="text-xs text-slate-500 mt-1 flex items-center justify-between">
               <span>Items below minimum threshold</span>
@@ -120,10 +148,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateTab }) => {
           </div>
           <div>
             <div className="text-2xl font-bold text-rose-600">
-              {summary?.nearExpiryCount || 0}
+              {summary?.nearExpiryCount ?? 0}
             </div>
             <p className="text-xs text-slate-500 mt-1 flex items-center justify-between">
-              <span>Expiring in &lt; 30 days ({summary?.expiredCount || 0} expired)</span>
+              <span>Expiring in &lt; 30 days ({summary?.expiredCount ?? 0} expired)</span>
               <ChevronRight className="w-4 h-4 text-slate-400" />
             </p>
           </div>
@@ -140,7 +168,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateTab }) => {
             </div>
             <h3 className="text-xl font-bold mb-2">Point of Sale (POS)</h3>
             <p className="text-sm text-teal-100 leading-relaxed">
-              Scan barcode or search medicines to instantly generate compliant invoices, apply automatic FIFO batch deductions, and bill walk-in or prescription patients.
+              Scan barcode or search medicines to instantly generate compliant invoices, apply automatic FEFO batch deductions, and bill walk-in or prescription patients.
             </p>
           </div>
 
@@ -210,4 +238,3 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateTab }) => {
     </div>
   );
 };
-
