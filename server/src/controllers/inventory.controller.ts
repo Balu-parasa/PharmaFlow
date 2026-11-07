@@ -29,7 +29,7 @@ export const getBatches = async (req: Request, res: Response) => {
       include: {
         medicine: true
       },
-      orderBy: { expiryDate: 'asc' }
+      orderBy: { expiryDate: 'asc' } // FEFO order
     });
 
     res.json({ success: true, count: batches.length, data: batches });
@@ -67,31 +67,48 @@ export const addBatch = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    const batch = await prisma.batch.create({
-      data: {
-        medicineId,
-        batchNumber,
-        expiryDate: new Date(expiryDate),
-        manufacturingDate: manufacturingDate ? new Date(manufacturingDate) : null,
-        costPrice: Number(costPrice),
-        sellingPrice: Number(sellingPrice),
-        initialQuantity: Number(quantity),
-        quantityInStock: Number(quantity),
-        purchaseOrderId: purchaseOrderId || null
-      },
-      include: {
-        medicine: true
-      }
-    });
+    const batch = await prisma.$transaction(async (tx) => {
+      const b = await tx.batch.create({
+        data: {
+          medicineId,
+          batchNumber,
+          expiryDate: new Date(expiryDate),
+          manufacturingDate: manufacturingDate ? new Date(manufacturingDate) : null,
+          costPrice: Number(costPrice),
+          sellingPrice: Number(sellingPrice),
+          initialQuantity: Number(quantity),
+          quantityInStock: Number(quantity),
+          purchaseOrderId: purchaseOrderId || null
+        },
+        include: {
+          medicine: true
+        }
+      });
 
-    await prisma.auditLog.create({
-      data: {
-        userId: req.user?.id,
-        action: 'ADD_BATCH',
-        entity: 'Batch',
-        entityId: batch.id,
-        details: JSON.stringify({ batchNumber, quantity, medicine: batch.medicine.name })
-      }
+      // Record immutable stock movement
+      await tx.stockMovement.create({
+        data: {
+          batchId: b.id,
+          userId: req.user?.id,
+          type: 'RESTOCK',
+          quantity: Number(quantity),
+          balanceAfter: Number(quantity),
+          reason: `Stock receipt batch ${batchNumber}`,
+          referenceId: purchaseOrderId || batchNumber
+        }
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: req.user?.id,
+          action: 'ADD_BATCH',
+          entity: 'Batch',
+          entityId: b.id,
+          details: JSON.stringify({ batchNumber, quantity, medicine: b.medicine.name })
+        }
+      });
+
+      return b;
     });
 
     res.status(201).json({ success: true, message: 'Stock batch added successfully', data: batch });
@@ -103,45 +120,74 @@ export const addBatch = async (req: AuthRequest, res: Response) => {
 export const adjustStock = async (req: AuthRequest, res: Response) => {
   try {
     const { id } = req.params;
-    const { adjustment, reason } = req.body; // adjustment can be positive or negative integer
+    const { adjustment, reason } = req.body; // adjustment can be positive or negative integer, reason is mandatory
 
-    const batch = await prisma.batch.findUnique({ where: { id } });
-    if (!batch) {
-      return res.status(404).json({ success: false, message: 'Batch not found' });
-    }
-
-    const newQuantity = batch.quantityInStock + Number(adjustment);
-    if (newQuantity < 0) {
+    if (!reason || String(reason).trim().length === 0) {
       return res.status(400).json({
         success: false,
-        message: `Cannot deduct ${Math.abs(adjustment)} units. Current stock is only ${batch.quantityInStock}.`
+        message: 'A valid reason is required for any manual stock adjustment.'
       });
     }
 
-    const updated = await prisma.batch.update({
-      where: { id },
-      data: { quantityInStock: newQuantity }
-    });
+    const delta = Number(adjustment);
+    if (isNaN(delta) || delta === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Adjustment must be a non-zero integer number.'
+      });
+    }
 
-    await prisma.auditLog.create({
-      data: {
-        userId: req.user?.id,
-        action: 'STOCK_ADJUSTMENT',
-        entity: 'Batch',
-        entityId: batch.id,
-        details: JSON.stringify({
-          batchNumber: batch.batchNumber,
-          oldQty: batch.quantityInStock,
-          newQty: newQuantity,
-          difference: adjustment,
-          reason
-        })
+    const updated = await prisma.$transaction(async (tx) => {
+      const batch = await tx.batch.findUnique({ where: { id } });
+      if (!batch) {
+        throw new Error('Batch not found');
       }
+
+      const newQuantity = batch.quantityInStock + delta;
+      if (newQuantity < 0) {
+        throw new Error(`Cannot deduct ${Math.abs(delta)} units. Current stock is only ${batch.quantityInStock}.`);
+      }
+
+      const b = await tx.batch.update({
+        where: { id },
+        data: { quantityInStock: newQuantity }
+      });
+
+      // Record stock movement
+      await tx.stockMovement.create({
+        data: {
+          batchId: b.id,
+          userId: req.user?.id,
+          type: 'ADJUSTMENT',
+          quantity: delta,
+          balanceAfter: newQuantity,
+          reason: String(reason).trim(),
+          referenceId: `ADJ-${new Date().toISOString().slice(0, 10)}`
+        }
+      });
+
+      await tx.auditLog.create({
+        data: {
+          userId: req.user?.id,
+          action: 'STOCK_ADJUSTMENT',
+          entity: 'Batch',
+          entityId: b.id,
+          details: JSON.stringify({
+            batchNumber: batch.batchNumber,
+            oldQty: batch.quantityInStock,
+            newQty: newQuantity,
+            difference: delta,
+            reason
+          })
+        }
+      });
+
+      return b;
     });
 
     res.json({ success: true, message: 'Stock adjusted successfully', data: updated });
   } catch (error: any) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(400).json({ success: false, message: error.message });
   }
 };
 
@@ -185,3 +231,26 @@ export const getExpiryAlerts = async (req: Request, res: Response) => {
   }
 };
 
+export const getStockMovements = async (req: Request, res: Response) => {
+  try {
+    const { batchId } = req.query;
+    const where: any = {};
+    if (batchId) {
+      where.batchId = String(batchId);
+    }
+
+    const movements = await prisma.stockMovement.findMany({
+      where,
+      include: {
+        batch: { include: { medicine: true } },
+        user: { select: { id: true, name: true, role: true } }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 100
+    });
+
+    res.json({ success: true, count: movements.length, data: movements });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

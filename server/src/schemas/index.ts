@@ -38,9 +38,10 @@ export const batchSchema = z.object({
 });
 
 export const saleItemSchema = z.object({
-  batchId: z.string().uuid('Valid batch ID required'),
+  batchId: z.string().uuid('Valid batch ID required').optional(),
+  medicineId: z.string().uuid('Valid medicine ID required').optional(),
   quantity: z.number().int().positive('Quantity must be greater than 0'),
-  unitPrice: z.number().nonnegative(),
+  unitPrice: z.number().nonnegative().optional(),
   discount: z.number().nonnegative().default(0)
 });
 
@@ -49,6 +50,7 @@ export const createSaleSchema = z.object({
   customerName: z.string().optional(),
   customerPhone: z.string().optional(),
   prescriptionId: z.string().uuid().optional(),
+  autoFEFO: z.boolean().default(false),
   items: z.array(saleItemSchema).min(1, 'Sale must include at least one item'),
   paymentMethod: z.enum(['CASH', 'CARD', 'UPI']).default('CASH'),
   discountAmount: z.number().nonnegative().default(0),
@@ -81,4 +83,3 @@ export const supplierSchema = z.object({
   address: z.string().optional(),
   gstin: z.string().optional()
 });
-

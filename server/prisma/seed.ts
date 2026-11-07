@@ -4,9 +4,10 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('--- Seeding PharmaFlow Database ---');
+  console.log('--- Seeding PharmaFlow Database (FEFO Compliant) ---');
 
   // Clean existing tables
+  await prisma.stockMovement.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.saleItem.deleteMany();
   await prisma.sale.deleteMany();
@@ -194,100 +195,144 @@ async function main() {
 
   console.log('✓ Medicines created');
 
-  // 5. Seed Batches (Fresh, Near Expiry < 30 days, and Low stock)
+  // 5. Seed Batches with distinct expiry dates to rigorously verify FEFO
   const now = new Date();
-  const future1Year = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+  const future30Days = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000); // Earliest expiry for Paracetamol
+  const future1Year = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);  // Later expiry for Paracetamol
   const future18Months = new Date(now.getTime() + 540 * 24 * 60 * 60 * 1000);
-  const nearExpiry20Days = new Date(now.getTime() + 20 * 24 * 60 * 60 * 1000); // Near Expiry alert!
-  const pastExpired = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000); // Expired alert!
+  const pastExpired = new Date(now.getTime() - 10 * 24 * 60 * 60 * 1000);   // Expired batch
 
-  await prisma.batch.createMany({
-    data: [
-      {
-        medicineId: paracetamol.id,
-        batchNumber: 'DOL-2024-B1',
-        expiryDate: future18Months,
-        manufacturingDate: new Date('2024-01-10'),
-        costPrice: 22.0,
-        sellingPrice: 32.5,
-        initialQuantity: 200,
-        quantityInStock: 180
-      },
-      {
-        medicineId: paracetamol.id,
-        batchNumber: 'DOL-2023-EXP',
-        expiryDate: nearExpiry20Days, // Expires soon
-        manufacturingDate: new Date('2023-04-05'),
-        costPrice: 20.0,
-        sellingPrice: 30.0,
-        initialQuantity: 50,
-        quantityInStock: 12
-      },
-      {
-        medicineId: amoxicillin.id,
-        batchNumber: 'AUG-2024-01',
-        expiryDate: future1Year,
-        manufacturingDate: new Date('2024-02-15'),
-        costPrice: 135.0,
-        sellingPrice: 185.0,
-        initialQuantity: 60,
-        quantityInStock: 45
-      },
-      {
-        medicineId: amoxicillin.id,
-        batchNumber: 'AUG-2023-OLD',
-        expiryDate: pastExpired, // Expired batch demo
-        manufacturingDate: new Date('2023-01-15'),
-        costPrice: 120.0,
-        sellingPrice: 175.0,
-        initialQuantity: 30,
-        quantityInStock: 5,
-        isRecalled: true
-      },
-      {
-        medicineId: cetirizine.id,
-        batchNumber: 'CET-2024-A',
-        expiryDate: future18Months,
-        manufacturingDate: new Date('2024-03-01'),
-        costPrice: 15.0,
-        sellingPrice: 28.0,
-        initialQuantity: 100,
-        quantityInStock: 8 // Low stock alert! (threshold is 15)
-      },
-      {
-        medicineId: pantocid.id,
-        batchNumber: 'PAN-2024-99',
-        expiryDate: future1Year,
-        manufacturingDate: new Date('2024-02-01'),
-        costPrice: 85.0,
-        sellingPrice: 125.0,
-        initialQuantity: 100,
-        quantityInStock: 80
-      },
-      {
-        medicineId: azithromycin.id,
-        batchNumber: 'AZI-2024-02',
-        expiryDate: future1Year,
-        manufacturingDate: new Date('2024-01-20'),
-        costPrice: 95.0,
-        sellingPrice: 140.0,
-        initialQuantity: 40,
-        quantityInStock: 30
-      },
-      {
-        medicineId: coughSyrup.id,
-        batchNumber: 'ASC-2024-S1',
-        expiryDate: future18Months,
-        manufacturingDate: new Date('2024-02-10'),
-        costPrice: 70.0,
-        sellingPrice: 105.0,
-        initialQuantity: 50,
-        quantityInStock: 42
-      }
-    ]
+  const batchDoloEarly = await prisma.batch.create({
+    data: {
+      medicineId: paracetamol.id,
+      batchNumber: 'DOL-2023-FEFO-EARLY',
+      expiryDate: future30Days, // Expires first -> Must be deducted first under FEFO!
+      manufacturingDate: new Date('2023-04-05'),
+      costPrice: 20.0,
+      sellingPrice: 30.0,
+      initialQuantity: 50,
+      quantityInStock: 25
+    }
   });
 
-  console.log('✓ Batches created (with realistic FIFO, near-expiry, and low stock items)');
+  const batchDoloLate = await prisma.batch.create({
+    data: {
+      medicineId: paracetamol.id,
+      batchNumber: 'DOL-2024-FEFO-LATER',
+      expiryDate: future1Year, // Expires later
+      manufacturingDate: new Date('2024-01-10'),
+      costPrice: 22.0,
+      sellingPrice: 32.5,
+      initialQuantity: 200,
+      quantityInStock: 180
+    }
+  });
+
+  const batchAugValid = await prisma.batch.create({
+    data: {
+      medicineId: amoxicillin.id,
+      batchNumber: 'AUG-2024-01',
+      expiryDate: future1Year,
+      manufacturingDate: new Date('2024-02-15'),
+      costPrice: 135.0,
+      sellingPrice: 185.0,
+      initialQuantity: 60,
+      quantityInStock: 45
+    }
+  });
+
+  const batchAugExpired = await prisma.batch.create({
+    data: {
+      medicineId: amoxicillin.id,
+      batchNumber: 'AUG-2023-EXPIRED',
+      expiryDate: pastExpired, // Expired batch
+      manufacturingDate: new Date('2023-01-15'),
+      costPrice: 120.0,
+      sellingPrice: 175.0,
+      initialQuantity: 30,
+      quantityInStock: 5,
+      isRecalled: false
+    }
+  });
+
+  const batchCetzine = await prisma.batch.create({
+    data: {
+      medicineId: cetirizine.id,
+      batchNumber: 'CET-2024-A',
+      expiryDate: future18Months,
+      manufacturingDate: new Date('2024-03-01'),
+      costPrice: 15.0,
+      sellingPrice: 28.0,
+      initialQuantity: 100,
+      quantityInStock: 8 // Low stock alert! (threshold is 15)
+    }
+  });
+
+  const batchPantocid = await prisma.batch.create({
+    data: {
+      medicineId: pantocid.id,
+      batchNumber: 'PAN-2024-99',
+      expiryDate: future1Year,
+      manufacturingDate: new Date('2024-02-01'),
+      costPrice: 85.0,
+      sellingPrice: 125.0,
+      initialQuantity: 100,
+      quantityInStock: 80
+    }
+  });
+
+  const batchAzithral = await prisma.batch.create({
+    data: {
+      medicineId: azithromycin.id,
+      batchNumber: 'AZI-2024-02',
+      expiryDate: future1Year,
+      manufacturingDate: new Date('2024-01-20'),
+      costPrice: 95.0,
+      sellingPrice: 140.0,
+      initialQuantity: 40,
+      quantityInStock: 30
+    }
+  });
+
+  const batchAscoril = await prisma.batch.create({
+    data: {
+      medicineId: coughSyrup.id,
+      batchNumber: 'ASC-2024-S1',
+      expiryDate: future18Months,
+      manufacturingDate: new Date('2024-02-10'),
+      costPrice: 70.0,
+      sellingPrice: 105.0,
+      initialQuantity: 50,
+      quantityInStock: 42
+    }
+  });
+
+  // Record initial stock movements for auditability
+  const batches = [
+    batchDoloEarly,
+    batchDoloLate,
+    batchAugValid,
+    batchAugExpired,
+    batchCetzine,
+    batchPantocid,
+    batchAzithral,
+    batchAscoril
+  ];
+
+  for (const b of batches) {
+    await prisma.stockMovement.create({
+      data: {
+        batchId: b.id,
+        userId: admin.id,
+        type: 'RESTOCK',
+        quantity: b.quantityInStock,
+        balanceAfter: b.quantityInStock,
+        reason: 'Initial inventory stock receipt'
+      }
+    });
+  }
+
+  console.log('✓ Batches created & StockMovement audit logs initialized');
 
   // 6. Seed a Prescription for Priya Sundaram
   const rx = await prisma.prescription.create({
@@ -335,4 +380,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

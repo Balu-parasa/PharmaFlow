@@ -10,17 +10,21 @@ datasource db {
 }
 
 model User {
-  id           String     @id @default(uuid())
+  id           String          @id @default(uuid())
   name         String
-  email        String     @unique
+  email        String          @unique
   passwordHash String
-  role         String     @default("CASHIER") // ADMIN, PHARMACIST, CASHIER
+  role         String          @default("CASHIER") // ADMIN, PHARMACIST, CASHIER
   phone        String?
-  isActive     Boolean    @default(true)
+  isActive     Boolean         @default(true)
   sales        Sale[]
   auditLogs    AuditLog[]
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
+  stockMovements StockMovement[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([email])
+  @@index([role])
 }
 
 model Customer {
@@ -33,6 +37,8 @@ model Customer {
   prescriptions Prescription[]
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
+
+  @@index([phone])
 }
 
 model Supplier {
@@ -54,7 +60,7 @@ model Medicine {
   genericName          String?
   sku                  String             @unique
   barcode              String?            @unique
-  category             String             // e.g. Antibiotics, Analgesics, Cardiac, Vitamins
+  category             String             // Antibiotics, Analgesics, Cardiac, Vitamins, etc.
   dosageForm           String             // Tablet, Syrup, Injection, Capsule, Ointment
   strength             String?            // e.g. 500mg, 10ml
   minStockThreshold    Int                @default(10)
@@ -64,12 +70,17 @@ model Medicine {
   prescriptionItems    PrescriptionItem[]
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
+
+  @@index([name])
+  @@index([sku])
+  @@index([barcode])
+  @@index([category])
 }
 
 model Batch {
-  id                String         @id @default(uuid())
+  id                String          @id @default(uuid())
   medicineId        String
-  medicine          Medicine       @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+  medicine          Medicine        @relation(fields: [medicineId], references: [id], onDelete: Cascade)
   batchNumber       String
   expiryDate        DateTime
   manufacturingDate DateTime?
@@ -78,13 +89,34 @@ model Batch {
   quantityInStock   Int
   initialQuantity   Int
   purchaseOrderId   String?
-  purchaseOrder     PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
-  isRecalled        Boolean        @default(false)
+  purchaseOrder     PurchaseOrder?  @relation(fields: [purchaseOrderId], references: [id])
+  isRecalled        Boolean         @default(false)
   saleItems         SaleItem[]
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  stockMovements    StockMovement[]
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
 
   @@unique([medicineId, batchNumber])
+  @@index([expiryDate])
+  @@index([medicineId])
+}
+
+model StockMovement {
+  id          String   @id @default(uuid())
+  batchId     String
+  batch       Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  type        String   // SALE, RETURN, ADJUSTMENT, RESTOCK, DISCARD_EXPIRED
+  quantity    Int      // positive for additions/returns, negative for sales/discards
+  balanceAfter Int
+  reason      String   // Required justification for audit trail
+  referenceId String?  // e.g. saleId, invoiceNumber, purchaseOrderId
+  createdAt   DateTime @default(now())
+
+  @@index([batchId])
+  @@index([type])
+  @@index([createdAt])
 }
 
 model PurchaseOrder {
@@ -98,6 +130,8 @@ model PurchaseOrder {
   batches     Batch[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@index([orderNumber])
 }
 
 model Sale {
@@ -119,6 +153,10 @@ model Sale {
   items          SaleItem[]
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
+
+  @@index([invoiceNumber])
+  @@index([cashierId])
+  @@index([createdAt])
 }
 
 model SaleItem {
@@ -132,6 +170,9 @@ model SaleItem {
   discount   Float    @default(0)
   totalPrice Float
   createdAt  DateTime @default(now())
+
+  @@index([saleId])
+  @@index([batchId])
 }
 
 model Prescription {
@@ -149,6 +190,9 @@ model Prescription {
   sales            Sale[]
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
+
+  @@index([prescriptionCode])
+  @@index([customerId])
 }
 
 model PrescriptionItem {
@@ -161,17 +205,23 @@ model PrescriptionItem {
   quantityRequired   Int
   quantityDispensed  Int          @default(0)
   createdAt          DateTime     @default(now())
+
+  @@index([prescriptionId])
+  @@index([medicineId])
 }
 
 model AuditLog {
   id        String   @id @default(uuid())
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
-  action    String   // STOCK_ADJUST, SALE_COMPLETED, PRICE_CHANGE, BATCH_RECALLED, etc.
+  action    String   // STOCK_ADJUST, SALE_COMPLETED, RETURN_PROCESSED, BATCH_RECALLED, etc.
   entity    String   // Medicine, Batch, Sale, User, etc.
   entityId  String?
   details   String?  // JSON stringified context
   ipAddress String?
   createdAt DateTime @default(now())
-}
 
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
