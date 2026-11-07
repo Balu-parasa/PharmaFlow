@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: pharmaflow_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: pharma_user
+      POSTGRES_PASSWORD: pharma_password
+      POSTGRES_DB: pharmaflow_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+

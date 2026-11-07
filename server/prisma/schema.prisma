@@ -1,0 +1,177 @@
+// Prisma schema for PharmaFlow - Smart Pharmacy Management System
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String     @id @default(uuid())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         String     @default("CASHIER") // ADMIN, PHARMACIST, CASHIER
+  phone        String?
+  isActive     Boolean    @default(true)
+  sales        Sale[]
+  auditLogs    AuditLog[]
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model Customer {
+  id            String         @id @default(uuid())
+  name          String
+  phone         String?        @unique
+  email         String?
+  address       String?
+  sales         Sale[]
+  prescriptions Prescription[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Supplier {
+  id             String          @id @default(uuid())
+  name           String
+  contactPerson  String?
+  email          String?
+  phone          String
+  address        String?
+  gstin          String?
+  purchaseOrders PurchaseOrder[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model Medicine {
+  id                   String             @id @default(uuid())
+  name                 String
+  genericName          String?
+  sku                  String             @unique
+  barcode              String?            @unique
+  category             String             // e.g. Antibiotics, Analgesics, Cardiac, Vitamins
+  dosageForm           String             // Tablet, Syrup, Injection, Capsule, Ointment
+  strength             String?            // e.g. 500mg, 10ml
+  minStockThreshold    Int                @default(10)
+  requiresPrescription Boolean            @default(false)
+  description          String?
+  batches              Batch[]
+  prescriptionItems    PrescriptionItem[]
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
+
+model Batch {
+  id                String         @id @default(uuid())
+  medicineId        String
+  medicine          Medicine       @relation(fields: [medicineId], references: [id], onDelete: Cascade)
+  batchNumber       String
+  expiryDate        DateTime
+  manufacturingDate DateTime?
+  costPrice         Float
+  sellingPrice      Float
+  quantityInStock   Int
+  initialQuantity   Int
+  purchaseOrderId   String?
+  purchaseOrder     PurchaseOrder? @relation(fields: [purchaseOrderId], references: [id])
+  isRecalled        Boolean        @default(false)
+  saleItems         SaleItem[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@unique([medicineId, batchNumber])
+}
+
+model PurchaseOrder {
+  id          String    @id @default(uuid())
+  orderNumber String    @unique
+  supplierId  String
+  supplier    Supplier  @relation(fields: [supplierId], references: [id])
+  totalAmount Float     @default(0)
+  status      String    @default("RECEIVED") // PENDING, ORDERED, RECEIVED, CANCELLED
+  orderDate   DateTime  @default(now())
+  batches     Batch[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Sale {
+  id             String         @id @default(uuid())
+  invoiceNumber  String         @unique
+  customerId     String?
+  customer       Customer?      @relation(fields: [customerId], references: [id])
+  cashierId      String
+  cashier        User           @relation(fields: [cashierId], references: [id])
+  prescriptionId String?
+  prescription   Prescription?  @relation(fields: [prescriptionId], references: [id])
+  subTotal       Float
+  taxAmount      Float          @default(0)
+  discountAmount Float          @default(0)
+  totalAmount    Float
+  paymentMethod  String         @default("CASH") // CASH, CARD, UPI
+  paymentStatus  String         @default("PAID") // PAID, PARTIAL, REFUNDED
+  notes          String?
+  items          SaleItem[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+}
+
+model SaleItem {
+  id         String   @id @default(uuid())
+  saleId     String
+  sale       Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  batchId    String
+  batch      Batch    @relation(fields: [batchId], references: [id])
+  quantity   Int
+  unitPrice  Float
+  discount   Float    @default(0)
+  totalPrice Float
+  createdAt  DateTime @default(now())
+}
+
+model Prescription {
+  id               String             @id @default(uuid())
+  prescriptionCode String             @unique
+  customerId       String
+  customer         Customer           @relation(fields: [customerId], references: [id])
+  doctorName       String
+  doctorLicense    String?
+  clinicHospital   String?
+  prescriptionDate DateTime           @default(now())
+  status           String             @default("PENDING") // PENDING, PARTIALLY_DISPENSED, DISPENSED, CANCELLED
+  notes            String?
+  items            PrescriptionItem[]
+  sales            Sale[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model PrescriptionItem {
+  id                 String       @id @default(uuid())
+  prescriptionId     String
+  prescription       Prescription @relation(fields: [prescriptionId], references: [id], onDelete: Cascade)
+  medicineId         String
+  medicine           Medicine     @relation(fields: [medicineId], references: [id])
+  dosageInstructions String       // e.g. "1-0-1 after food for 5 days"
+  quantityRequired   Int
+  quantityDispensed  Int          @default(0)
+  createdAt          DateTime     @default(now())
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  action    String   // STOCK_ADJUST, SALE_COMPLETED, PRICE_CHANGE, BATCH_RECALLED, etc.
+  entity    String   // Medicine, Batch, Sale, User, etc.
+  entityId  String?
+  details   String?  // JSON stringified context
+  ipAddress String?
+  createdAt DateTime @default(now())
+}
+
