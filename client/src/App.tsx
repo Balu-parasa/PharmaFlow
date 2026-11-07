@@ -77,7 +77,7 @@ export function App() {
   };
 
   return (
-    <div className="flex min-h-screen bg-slatebg font-sans text-textPrimary">
+    <div className="flex min-h-screen bg-[#F5F7FC] font-sans text-slate-900 antialiased">
       <Sidebar
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
@@ -93,7 +93,7 @@ export function App() {
           lowStockCount={lowStockCount}
         />
 
-        <main className="flex-1 p-6 sm:p-8 overflow-y-auto">
+        <main className="flex-1 p-8 sm:p-10 lg:p-12 overflow-y-auto">
           {currentTab === 'dashboard' && <Dashboard onNavigateTab={setCurrentTab} />}
           {currentTab === 'pos' && <POS />}
           {currentTab === 'medicines' && <MedicinesCatalogue />}

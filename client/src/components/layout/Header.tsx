@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, AlertTriangle, ShieldCheck, User as UserIcon } from 'lucide-react';
+import { Search, AlertTriangle, ShieldCheck, User as UserIcon, Bell, Sparkles } from 'lucide-react';
 import { User } from '../../types';
 
 interface HeaderProps {
@@ -11,18 +11,19 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ title, user, nearExpiryCount, lowStockCount }) => {
   return (
-    <header className="h-16 bg-white border-b border-slate-200/80 px-6 sm:px-8 flex items-center justify-between sticky top-0 z-20 shadow-subtle">
-      {/* Page Title */}
-      <div className="flex items-center space-x-3">
-        <h2 className="text-lg sm:text-xl font-extrabold text-textPrimary tracking-tight">{title}</h2>
+    <header className="h-20 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between sticky top-0 z-20 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md bg-white/95">
+      
+      {/* Title */}
+      <div className="flex items-center space-x-3.5">
+        <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">{title}</h2>
       </div>
 
       {/* Right Controls */}
       <div className="flex items-center space-x-4">
-        {/* Alerts Pill */}
+        {/* Real-time Alerts Pill */}
         {(nearExpiryCount > 0 || lowStockCount > 0) && (
-          <div className="flex items-center space-x-2 bg-amber-50 border border-amber-200 text-amber-900 text-xs px-3 py-1.5 rounded-full font-semibold shadow-sm">
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+          <div className="flex items-center space-x-2 bg-amber-50 border border-amber-200 text-amber-900 text-xs px-4 py-2 rounded-2xl font-bold shadow-sm">
+            <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 animate-bounce" />
             <span>
               {nearExpiryCount > 0 && `${nearExpiryCount} Near Expiry`}
               {nearExpiryCount > 0 && lowStockCount > 0 && ' • '}
@@ -32,19 +33,19 @@ export const Header: React.FC<HeaderProps> = ({ title, user, nearExpiryCount, lo
         )}
 
         {/* System Online Status */}
-        <div className="hidden sm:flex items-center space-x-1.5 text-xs text-textSecondary bg-slatebg px-3 py-1.5 rounded-full font-semibold border border-slate-200/60">
-          <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-          <span>System Online</span>
+        <div className="hidden sm:flex items-center space-x-2 text-xs text-slate-600 bg-slate-50 px-4 py-2 rounded-2xl font-bold border border-slate-200/70">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+          <span>FEFO Engine Online</span>
         </div>
 
         {/* Current user badge */}
-        <div className="flex items-center space-x-2.5 pl-3 border-l border-slate-200">
-          <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
+        <div className="flex items-center space-x-3 pl-4 border-l border-slate-200">
+          <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black text-sm shadow-sm border border-primary/20">
             {user?.name?.charAt(0) || 'U'}
           </div>
           <div className="hidden md:block text-left">
-            <p className="text-xs font-bold text-textPrimary leading-tight">{user?.name}</p>
-            <p className="text-[10px] text-textSecondary font-semibold uppercase tracking-wider">{user?.role}</p>
+            <p className="text-xs font-black text-slate-900 leading-tight">{user?.name}</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{user?.role}</p>
           </div>
         </div>
       </div>
