@@ -8,7 +8,10 @@ build/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-prisma/*.db
-prisma/*.db-journal
+*.db
+*.db-journal
+dev.db
+dev.db-journal
+server/prisma/*.db
+server/prisma/*.db-journal
 coverage/
-
