@@ -22,19 +22,34 @@ export const getDashboardSummary = async (req: Request, res: Response) => {
       _count: { id: true }
     });
 
-    // 3. Low stock count
-    const medicines = await prisma.medicine.findMany({
-      include: {
-        batches: {
-          where: { isRecalled: false }
-        }
-      }
+    // 3. Low stock and inventory valuation
+    const batches = await prisma.batch.findMany({
+      where: { isRecalled: false },
+      include: { medicine: true }
     });
 
-    const lowStockMedicines = medicines.filter((med) => {
-      const stock = med.batches.reduce((sum, b) => sum + b.quantityInStock, 0);
-      return stock <= med.minStockThreshold;
-    });
+    let totalStockUnits = 0;
+    let totalValuation = 0;
+    const medicineStockMap: Record<string, { med: any; stock: number }> = {};
+
+    for (const b of batches) {
+      totalStockUnits += b.quantityInStock;
+      totalValuation += b.quantityInStock * b.costPrice;
+
+      if (!medicineStockMap[b.medicineId]) {
+        medicineStockMap[b.medicineId] = { med: b.medicine, stock: 0 };
+      }
+      medicineStockMap[b.medicineId].stock += b.quantityInStock;
+    }
+
+    const allMedicines = await prisma.medicine.findMany();
+    let lowStockCount = 0;
+    for (const m of allMedicines) {
+      const currentStock = medicineStockMap[m.id]?.stock || 0;
+      if (currentStock <= m.minStockThreshold) {
+        lowStockCount++;
+      }
+    }
 
     // 4. Near expiry and expired counts
     const expiredCount = await prisma.batch.count({
@@ -54,12 +69,13 @@ export const getDashboardSummary = async (req: Request, res: Response) => {
       }
     });
 
-    // 5. Total customers
+    // 5. Total customers & suppliers
     const totalCustomers = await prisma.customer.count();
+    const totalSuppliers = await prisma.supplier.count();
 
-    // 6. Recent 5 sales
+    // 6. Recent sales
     const recentSales = await prisma.sale.findMany({
-      take: 5,
+      take: 6,
       orderBy: { createdAt: 'desc' },
       include: {
         customer: true,
@@ -68,6 +84,39 @@ export const getDashboardSummary = async (req: Request, res: Response) => {
       }
     });
 
+    // 7. Recent stock movements
+    const recentMovements = await prisma.stockMovement.findMany({
+      take: 6,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        batch: { include: { medicine: true } },
+        user: { select: { name: true, role: true } }
+      }
+    });
+
+    // 8. Top selling medicines by quantity sold
+    const topSaleItems = await prisma.saleItem.groupBy({
+      by: ['batchId'],
+      _sum: { quantity: true, totalPrice: true },
+      orderBy: { _sum: { quantity: 'desc' } },
+      take: 5
+    });
+
+    const topSellingMedicines = await Promise.all(
+      topSaleItems.map(async (item) => {
+        const batch = await prisma.batch.findUnique({
+          where: { id: item.batchId },
+          include: { medicine: true }
+        });
+        return {
+          medicineName: batch?.medicine.name || 'Unknown',
+          dosageForm: batch?.medicine.dosageForm || 'Unit',
+          totalQuantitySold: item._sum.quantity || 0,
+          totalRevenue: item._sum.totalPrice || 0
+        };
+      })
+    );
+
     res.json({
       success: true,
       data: {
@@ -75,12 +124,17 @@ export const getDashboardSummary = async (req: Request, res: Response) => {
         todaySalesCount: todaySales._count.id || 0,
         totalRevenue: allTimeSales._sum.totalAmount || 0,
         totalSalesCount: allTimeSales._count.id || 0,
-        lowStockCount: lowStockMedicines.length,
+        totalStockUnits,
+        totalValuation,
+        lowStockCount,
         expiredCount,
         nearExpiryCount,
         totalCustomers,
-        totalMedicinesCount: medicines.length,
-        recentSales
+        totalSuppliers,
+        totalMedicinesCount: allMedicines.length,
+        recentSales,
+        recentMovements,
+        topSellingMedicines
       }
     });
   } catch (error: any) {
@@ -88,3 +142,40 @@ export const getDashboardSummary = async (req: Request, res: Response) => {
   }
 };
 
+export const getAuditLogs = async (req: Request, res: Response) => {
+  try {
+    const logs = await prisma.auditLog.findMany({
+      take: 100,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: { id: true, name: true, role: true, email: true } }
+      }
+    });
+    res.json({ success: true, count: logs.length, data: logs });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+export const getUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        phone: true,
+        isActive: true,
+        createdAt: true,
+        _count: {
+          select: { sales: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json({ success: true, count: users.length, data: users });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};

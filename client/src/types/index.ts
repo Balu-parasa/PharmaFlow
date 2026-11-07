@@ -4,6 +4,11 @@ export interface User {
   email: string;
   role: 'ADMIN' | 'PHARMACIST' | 'CASHIER';
   phone?: string;
+  isActive?: boolean;
+  createdAt?: string;
+  _count?: {
+    sales: number;
+  };
 }
 
 export interface Medicine {
@@ -39,6 +44,29 @@ export interface Batch {
   medicine?: Medicine;
 }
 
+export interface StockMovement {
+  id: string;
+  batchId: string;
+  batch?: {
+    batchNumber: string;
+    medicine?: {
+      name: string;
+      dosageForm: string;
+    };
+  };
+  userId?: string;
+  user?: {
+    name: string;
+    role: string;
+  };
+  type: 'SALE' | 'RETURN' | 'ADJUSTMENT' | 'RESTOCK' | 'DISCARD_EXPIRED';
+  quantity: number;
+  balanceAfter: number;
+  reason: string;
+  referenceId?: string;
+  createdAt: string;
+}
+
 export interface CartItem {
   batchId: string;
   medicineId: string;
@@ -60,13 +88,14 @@ export interface Sale {
   customerId?: string;
   customer?: { name: string; phone?: string };
   cashierId: string;
-  cashier?: { name: string };
+  cashier?: { name: string; phone?: string };
   subTotal: number;
   taxAmount: number;
   discountAmount: number;
   totalAmount: number;
   paymentMethod: string;
   paymentStatus: string;
+  notes?: string;
   createdAt: string;
   items: Array<{
     id: string;
@@ -115,16 +144,41 @@ export interface Supplier {
   };
 }
 
+export interface AuditLog {
+  id: string;
+  userId?: string;
+  user?: {
+    name: string;
+    email: string;
+    role: string;
+  };
+  action: string;
+  entity: string;
+  entityId?: string;
+  details?: string;
+  ipAddress?: string;
+  createdAt: string;
+}
+
 export interface DashboardSummary {
   todayRevenue: number;
   todaySalesCount: number;
   totalRevenue: number;
   totalSalesCount: number;
+  totalStockUnits: number;
+  totalValuation: number;
   lowStockCount: number;
   expiredCount: number;
   nearExpiryCount: number;
   totalCustomers: number;
+  totalSuppliers: number;
   totalMedicinesCount: number;
   recentSales: Sale[];
+  recentMovements: StockMovement[];
+  topSellingMedicines: Array<{
+    medicineName: string;
+    dosageForm: string;
+    totalQuantitySold: number;
+    totalRevenue: number;
+  }>;
 }
-

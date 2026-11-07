@@ -3,10 +3,15 @@ import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { Dashboard } from './pages/Dashboard';
 import { POS } from './pages/POS';
+import { MedicinesCatalogue } from './pages/MedicinesCatalogue';
 import { Inventory } from './pages/Inventory';
 import { Prescriptions } from './pages/Prescriptions';
 import { SalesHistory } from './pages/SalesHistory';
+import { SalesReturns } from './pages/SalesReturns';
 import { Suppliers } from './pages/Suppliers';
+import { Reports } from './pages/Reports';
+import { AuditTrail } from './pages/AuditTrail';
+import { UserDirectory } from './pages/UserDirectory';
 import { Login } from './pages/Login';
 import { User } from './types';
 import api from './services/api';
@@ -58,16 +63,21 @@ export function App() {
   }
 
   const tabTitles: Record<string, string> = {
-    dashboard: 'Executive Dashboard & Metrics',
-    pos: 'Point of Sale (POS) Billing Terminal',
-    inventory: 'Inventory & Batch Expiry Management',
-    prescriptions: 'Prescription Records & Dispensing',
-    sales: 'Sales Transactions & Invoice Records',
-    suppliers: 'Supplier & Vendor Directory'
+    dashboard: 'Executive Pharmacy Operations Dashboard',
+    pos: 'Point of Sale (POS) Billing & Dispensing Terminal',
+    medicines: 'Medicines Product Catalogue',
+    inventory: 'Batch Inventory & FEFO Expiry Tracking',
+    prescriptions: 'Clinical Prescriptions & Patient Dispense',
+    sales: 'Sales Transaction Register & Invoices',
+    returns: 'Sales Returns & Inventory Reconciliation',
+    suppliers: 'Suppliers & Vendors Directory',
+    reports: 'Financial Reports & Stock Valuation',
+    'audit-logs': 'Immutable Regulatory Audit Trail',
+    users: 'Staff & Role-Based Access Directory'
   };
 
   return (
-    <div className="flex min-h-screen bg-slate-50 font-sans">
+    <div className="flex min-h-screen bg-slatebg font-sans text-textPrimary">
       <Sidebar
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
@@ -83,13 +93,18 @@ export function App() {
           lowStockCount={lowStockCount}
         />
 
-        <main className="flex-1 p-8 overflow-y-auto">
+        <main className="flex-1 p-6 sm:p-8 overflow-y-auto">
           {currentTab === 'dashboard' && <Dashboard onNavigateTab={setCurrentTab} />}
           {currentTab === 'pos' && <POS />}
+          {currentTab === 'medicines' && <MedicinesCatalogue />}
           {currentTab === 'inventory' && <Inventory />}
           {currentTab === 'prescriptions' && <Prescriptions />}
           {currentTab === 'sales' && <SalesHistory />}
+          {currentTab === 'returns' && <SalesReturns />}
           {currentTab === 'suppliers' && <Suppliers />}
+          {currentTab === 'reports' && <Reports />}
+          {currentTab === 'audit-logs' && <AuditTrail />}
+          {currentTab === 'users' && <UserDirectory />}
         </main>
       </div>
     </div>
