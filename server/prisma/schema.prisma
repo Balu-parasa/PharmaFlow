@@ -10,18 +10,18 @@ datasource db {
 }
 
 model User {
-  id           String          @id @default(uuid())
-  name         String
-  email        String          @unique
-  passwordHash String
-  role         String          @default("CASHIER") // ADMIN, PHARMACIST, CASHIER
-  phone        String?
-  isActive     Boolean         @default(true)
-  sales        Sale[]
-  auditLogs    AuditLog[]
+  id             String          @id @default(uuid())
+  name           String
+  email          String          @unique
+  passwordHash   String
+  role           String          @default("CASHIER") // ADMIN, PHARMACIST, CASHIER
+  phone          String?
+  isActive       Boolean         @default(true)
+  sales          Sale[]
+  auditLogs      AuditLog[]
   stockMovements StockMovement[]
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   @@index([email])
   @@index([role])
@@ -65,6 +65,7 @@ model Medicine {
   strength             String?            // e.g. 500mg, 10ml
   minStockThreshold    Int                @default(10)
   requiresPrescription Boolean            @default(false)
+  isActive             Boolean            @default(true) // Support soft deactivation
   description          String?
   batches              Batch[]
   prescriptionItems    PrescriptionItem[]
@@ -75,6 +76,7 @@ model Medicine {
   @@index([sku])
   @@index([barcode])
   @@index([category])
+  @@index([isActive])
 }
 
 model Batch {
@@ -102,17 +104,17 @@ model Batch {
 }
 
 model StockMovement {
-  id          String   @id @default(uuid())
-  batchId     String
-  batch       Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id])
-  type        String   // SALE, RETURN, ADJUSTMENT, RESTOCK, DISCARD_EXPIRED
-  quantity    Int      // positive for additions/returns, negative for sales/discards
+  id           String   @id @default(uuid())
+  batchId      String
+  batch        Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  userId       String?
+  user         User?    @relation(fields: [userId], references: [id])
+  type         String   // SALE, RETURN, ADJUSTMENT, RESTOCK, DISCARD_EXPIRED
+  quantity     Int      // positive for additions/returns, negative for sales/discards
   balanceAfter Int
-  reason      String   // Required justification for audit trail
-  referenceId String?  // e.g. saleId, invoiceNumber, purchaseOrderId
-  createdAt   DateTime @default(now())
+  reason       String   // Required justification for audit trail
+  referenceId  String?  // e.g. saleId, invoiceNumber, purchaseOrderId
+  createdAt    DateTime @default(now())
 
   @@index([batchId])
   @@index([type])

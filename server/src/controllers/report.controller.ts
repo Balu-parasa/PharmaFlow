@@ -142,6 +142,106 @@ export const getDashboardSummary = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * PHASE 2.G: Comprehensive Financial & Stock Reconciliation Reports
+ * Calculates: Opening stock, Purchases received, Sales dispensed, Returns processed, Manual adjustments
+ * Equation: Verified Balance = Total Restocks - Total Sales + Total Returns + Total Adjustments
+ */
+export const getReconciliationReport = async (req: Request, res: Response) => {
+  try {
+    const movements = await prisma.stockMovement.findMany({
+      include: {
+        batch: { include: { medicine: true } },
+        user: { select: { name: true, role: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    let totalRestocked = 0;
+    let totalSold = 0;
+    let totalReturned = 0;
+    let totalAdjusted = 0;
+
+    for (const m of movements) {
+      if (m.type === 'RESTOCK') {
+        totalRestocked += m.quantity;
+      } else if (m.type === 'SALE') {
+        totalSold += Math.abs(m.quantity);
+      } else if (m.type === 'RETURN') {
+        totalReturned += m.quantity;
+      } else if (m.type === 'ADJUSTMENT') {
+        totalAdjusted += m.quantity;
+      }
+    }
+
+    const calculatedBalance = totalRestocked - totalSold + totalReturned + totalAdjusted;
+
+    // Compare with current live sum of all batch stocks
+    const liveBatchAggregate = await prisma.batch.aggregate({
+      _sum: { quantityInStock: true }
+    });
+    const livePhysicalStock = liveBatchAggregate._sum.quantityInStock || 0;
+    const isReconciled = calculatedBalance === livePhysicalStock;
+
+    // Sales report summary
+    const salesTotal = await prisma.sale.aggregate({
+      _sum: {
+        totalAmount: true,
+        subTotal: true,
+        taxAmount: true,
+        discountAmount: true
+      },
+      _count: { id: true }
+    });
+
+    // Expiry breakdown
+    const now = new Date();
+    const thirtyDaysAhead = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const expiredBatches = await prisma.batch.findMany({
+      where: { expiryDate: { lte: now }, quantityInStock: { gt: 0 } },
+      include: { medicine: true }
+    });
+    const nearExpiryBatches = await prisma.batch.findMany({
+      where: {
+        expiryDate: { gt: now, lte: thirtyDaysAhead },
+        quantityInStock: { gt: 0 }
+      },
+      include: { medicine: true }
+    });
+
+    res.json({
+      success: true,
+      data: {
+        reconciliation: {
+          totalRestocked,
+          totalSold,
+          totalReturned,
+          totalAdjusted,
+          calculatedBalance,
+          livePhysicalStock,
+          isReconciled,
+          discrepancy: livePhysicalStock - calculatedBalance
+        },
+        salesSummary: {
+          invoiceCount: salesTotal._count.id,
+          grossRevenue: salesTotal._sum.totalAmount || 0,
+          netSubtotal: salesTotal._sum.subTotal || 0,
+          taxCollected: salesTotal._sum.taxAmount || 0,
+          discountGiven: salesTotal._sum.discountAmount || 0
+        },
+        expiryAudit: {
+          expiredCount: expiredBatches.length,
+          nearExpiryCount: nearExpiryBatches.length,
+          expiredValue: expiredBatches.reduce((acc, b) => acc + b.quantityInStock * b.costPrice, 0),
+          nearExpiryValue: nearExpiryBatches.reduce((acc, b) => acc + b.quantityInStock * b.costPrice, 0)
+        }
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 export const getAuditLogs = async (req: Request, res: Response) => {
   try {
     const logs = await prisma.auditLog.findMany({

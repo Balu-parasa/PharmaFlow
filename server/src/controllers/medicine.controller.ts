@@ -4,7 +4,7 @@ import { AuthRequest } from '../middlewares/auth.middleware.js';
 
 export const getMedicines = async (req: Request, res: Response) => {
   try {
-    const { search, category, requiresPrescription } = req.query;
+    const { search, category, requiresPrescription, isActive, page = '1', limit = '50' } = req.query;
 
     const where: any = {};
     if (search) {
@@ -17,7 +17,7 @@ export const getMedicines = async (req: Request, res: Response) => {
       ];
     }
 
-    if (category) {
+    if (category && category !== 'ALL') {
       where.category = String(category);
     }
 
@@ -25,16 +25,29 @@ export const getMedicines = async (req: Request, res: Response) => {
       where.requiresPrescription = requiresPrescription === 'true';
     }
 
-    const medicines = await prisma.medicine.findMany({
-      where,
-      include: {
-        batches: {
-          where: { isRecalled: false },
-          orderBy: { expiryDate: 'asc' } // FIFO ordering
-        }
-      },
-      orderBy: { name: 'asc' }
-    });
+    if (isActive !== undefined) {
+      where.isActive = isActive === 'true';
+    }
+
+    const pageNum = Math.max(1, parseInt(String(page)) || 1);
+    const limitNum = Math.min(100, Math.max(1, parseInt(String(limit)) || 50));
+    const skip = (pageNum - 1) * limitNum;
+
+    const [totalCount, medicines] = await Promise.all([
+      prisma.medicine.count({ where }),
+      prisma.medicine.findMany({
+        where,
+        include: {
+          batches: {
+            where: { isRecalled: false },
+            orderBy: { expiryDate: 'asc' } // FEFO ordering
+          }
+        },
+        orderBy: { name: 'asc' },
+        skip,
+        take: limitNum
+      })
+    ]);
 
     // Compute total stock and earliest expiry for each medicine
     const enriched = medicines.map((med) => {
@@ -51,7 +64,14 @@ export const getMedicines = async (req: Request, res: Response) => {
       };
     });
 
-    res.json({ success: true, count: enriched.length, data: enriched });
+    res.json({
+      success: true,
+      count: enriched.length,
+      total: totalCount,
+      page: pageNum,
+      totalPages: Math.ceil(totalCount / limitNum),
+      data: enriched
+    });
   } catch (error: any) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -125,7 +145,8 @@ export const createMedicine = async (req: AuthRequest, res: Response) => {
         strength,
         minStockThreshold: Number(minStockThreshold) || 10,
         requiresPrescription: Boolean(requiresPrescription),
-        description
+        description,
+        isActive: true
       }
     });
 
@@ -171,3 +192,35 @@ export const updateMedicine = async (req: AuthRequest, res: Response) => {
   }
 };
 
+export const toggleMedicineStatus = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const medicine = await prisma.medicine.findUnique({ where: { id } });
+    if (!medicine) {
+      return res.status(404).json({ success: false, message: 'Medicine not found' });
+    }
+
+    const updated = await prisma.medicine.update({
+      where: { id },
+      data: { isActive: !medicine.isActive }
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        userId: req.user?.id,
+        action: updated.isActive ? 'ACTIVATE_MEDICINE' : 'DEACTIVATE_MEDICINE',
+        entity: 'Medicine',
+        entityId: updated.id,
+        details: JSON.stringify({ name: updated.name, isActive: updated.isActive })
+      }
+    });
+
+    res.json({
+      success: true,
+      message: `Medicine ${updated.isActive ? 'activated' : 'deactivated'} successfully`,
+      data: updated
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
