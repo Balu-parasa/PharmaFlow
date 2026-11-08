@@ -77,7 +77,7 @@ export function App() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F5F7FC] font-sans text-slate-900 antialiased">
+    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-slate-900 antialiased">
       <Sidebar
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
@@ -93,18 +93,20 @@ export function App() {
           lowStockCount={lowStockCount}
         />
 
-        <main className="flex-1 p-8 sm:p-10 lg:p-12 overflow-y-auto">
-          {currentTab === 'dashboard' && <Dashboard onNavigateTab={setCurrentTab} />}
-          {currentTab === 'pos' && <POS />}
-          {currentTab === 'medicines' && <MedicinesCatalogue />}
-          {currentTab === 'inventory' && <Inventory />}
-          {currentTab === 'prescriptions' && <Prescriptions />}
-          {currentTab === 'sales' && <SalesHistory />}
-          {currentTab === 'returns' && <SalesReturns />}
-          {currentTab === 'suppliers' && <Suppliers />}
-          {currentTab === 'reports' && <Reports />}
-          {currentTab === 'audit-logs' && <AuditTrail />}
-          {currentTab === 'users' && <UserDirectory />}
+        <main className="flex-1 p-6 sm:p-8 lg:p-8 xl:p-10 overflow-y-auto">
+          <div className="max-w-[1700px] w-full mx-auto">
+            {currentTab === 'dashboard' && <Dashboard onNavigateTab={setCurrentTab} />}
+            {currentTab === 'pos' && <POS />}
+            {currentTab === 'medicines' && <MedicinesCatalogue />}
+            {currentTab === 'inventory' && <Inventory />}
+            {currentTab === 'prescriptions' && <Prescriptions />}
+            {currentTab === 'sales' && <SalesHistory />}
+            {currentTab === 'returns' && <SalesReturns />}
+            {currentTab === 'suppliers' && <Suppliers />}
+            {currentTab === 'reports' && <Reports />}
+            {currentTab === 'audit-logs' && <AuditTrail />}
+            {currentTab === 'users' && <UserDirectory />}
+          </div>
         </main>
       </div>
     </div>

@@ -84,7 +84,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigateTab }) => {
   }
 
   return (
-    <div className="space-y-8 max-w-[1600px] mx-auto pb-10">
+    <div className="space-y-8 w-full pb-10">
       
       {/* ========================================================= */}
       {/* TOP WELCOME BANNER WITH QUICK ACTION BUTTONS */}

@@ -86,88 +86,113 @@ export const Prescriptions: React.FC = () => {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-10">
       {/* Header bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center justify-between">
-        <div className="relative w-80">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-          <input
-            type="text"
-            placeholder="Search by Rx Code, Patient, Doctor..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs focus:ring-1 focus:ring-brand-500 focus:outline-none"
-          />
+      <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200/80 shadow-card flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        <div>
+          <div className="inline-flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full text-xs font-bold text-primary mb-2 border border-blue-100">
+            <FileText className="w-3.5 h-3.5" />
+            <span>Digital Prescription & Clinical Workflow</span>
+          </div>
+          <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+            Clinical Prescriptions & Dispensing
+          </h3>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Validate physician licenses, cross-reference dosage instructions, and dispense controlled pharmaceuticals.
+          </p>
         </div>
 
-        <button
-          onClick={() => setShowModal(true)}
-          className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-sm"
-        >
-          <Plus className="w-4 h-4" />
-          <span>New Prescription Entry</span>
-        </button>
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-80">
+            <Search className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+            <input
+              type="text"
+              placeholder="Search by Rx Code, Patient, Doctor..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-11 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-900 focus:outline-none focus:border-primary focus:bg-white transition-all"
+            />
+          </div>
+
+          <button
+            onClick={() => setShowModal(true)}
+            className="w-full sm:w-auto px-5 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-2xl text-xs sm:text-sm font-bold flex items-center justify-center space-x-2 shadow-card transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            <span>New Prescription</span>
+          </button>
+        </div>
       </div>
 
       {/* Prescription Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
         {filtered.map((rx) => (
           <div
             key={rx.id}
-            className="bg-white rounded-xl border border-slate-200/80 shadow-sm p-5 space-y-4 hover:border-brand-500/50 transition-all"
+            className="bg-white rounded-3xl border border-slate-200/80 shadow-card p-6 space-y-4 hover:border-primary/40 hover:shadow-card-hover transition-all flex flex-col justify-between"
           >
-            <div className="flex items-start justify-between">
-              <div>
-                <span className="font-mono text-xs font-bold text-brand-700 bg-brand-50 px-2.5 py-1 rounded">
+            <div>
+              <div className="flex items-start justify-between mb-3">
+                <span className="font-mono text-xs font-bold text-primary bg-primary/10 px-3 py-1 rounded-xl">
                   {rx.prescriptionCode}
                 </span>
-                <h3 className="font-bold text-slate-800 text-sm mt-2">{rx.customer?.name}</h3>
-                <p className="text-xs text-slate-500">Phone: {rx.customer?.phone || 'N/A'}</p>
+
+                <div>
+                  {rx.status === 'DISPENSED' ? (
+                    <span className="inline-flex items-center space-x-1.5 text-emerald-700 bg-emerald-50 text-xs font-bold px-3 py-1 rounded-full border border-emerald-200">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Dispensed</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center space-x-1.5 text-amber-700 bg-amber-50 text-xs font-bold px-3 py-1 rounded-full border border-amber-200">
+                      <Clock className="w-3.5 h-3.5 text-amber-600" />
+                      <span>Pending Dispense</span>
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div>
-                {rx.status === 'DISPENSED' ? (
-                  <span className="inline-flex items-center space-x-1 text-emerald-700 bg-emerald-50 text-[11px] font-bold px-2.5 py-1 rounded-full">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                    <span>Dispensed</span>
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center space-x-1 text-amber-700 bg-amber-50 text-[11px] font-bold px-2.5 py-1 rounded-full">
-                    <Clock className="w-3.5 h-3.5" />
-                    <span>Pending Dispense</span>
-                  </span>
-                )}
-              </div>
-            </div>
+              <h4 className="font-black text-slate-900 text-base">{rx.customer?.name}</h4>
+              <p className="text-xs text-slate-400 font-medium mt-0.5">Contact: {rx.customer?.phone || 'Not recorded'}</p>
 
-            {/* Doctor Info */}
-            <div className="p-3 bg-slate-50 rounded-lg text-xs text-slate-600 border border-slate-100">
-              <div className="font-semibold text-slate-800">{rx.doctorName}</div>
-              <div className="text-[11px] text-slate-400">
-                {rx.clinicHospital} {rx.doctorLicense ? `• Lic: ${rx.doctorLicense}` : ''}
+              {/* Doctor Info */}
+              <div className="mt-4 p-4 bg-slate-50/80 rounded-2xl text-xs text-slate-600 border border-slate-100 space-y-1">
+                <div className="font-bold text-slate-800 text-sm">{rx.doctorName}</div>
+                <div className="text-xs text-slate-400 font-medium">
+                  {rx.clinicHospital} {rx.doctorLicense ? `• Lic: ${rx.doctorLicense}` : ''}
+                </div>
+                {rx.notes && <div className="mt-2 italic text-slate-600 font-serif border-t border-slate-200/50 pt-2">"{rx.notes}"</div>}
               </div>
-              {rx.notes && <div className="mt-1 italic text-slate-500 font-serif">"{rx.notes}"</div>}
-            </div>
 
-            {/* Prescribed Items */}
-            <div>
-              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                Prescribed Medicines
-              </div>
-              <div className="space-y-1.5">
-                {rx.items.map((item) => (
-                  <div
-                    key={item.id}
-                    className="p-2 rounded bg-slate-50 text-xs flex items-center justify-between"
-                  >
-                    <div>
-                      <div className="font-semibold text-slate-800">{item.medicine?.name}</div>
-                      <div className="text-[11px] text-slate-500">{item.dosageInstructions}</div>
+              {/* Prescribed Items */}
+              <div className="mt-4">
+                <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
+                  Prescribed Medicines ({rx.items.length})
+                </div>
+                <div className="space-y-2">
+                  {rx.items.map((item) => (
+                    <div
+                      key={item.id}
+                      className="p-3 bg-white border border-slate-200/70 rounded-xl text-xs flex items-center justify-between shadow-sm"
+                    >
+                      <div>
+                        <div className="font-bold text-slate-900">{item.medicine?.name}</div>
+                        <div className="text-[11px] text-slate-400 mt-0.5">{item.dosageInstructions}</div>
+                      </div>
+                      <div className="text-right pl-3">
+                        <span className="px-2.5 py-1 bg-slate-100 rounded-lg text-xs font-black text-slate-800">
+                          {item.quantityRequired} units
+                        </span>
+                      </div>
                     </div>
-                    <div className="font-bold text-slate-700">{item.quantityRequired} units</div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
+            </div>
+
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400 font-medium">
+              <span>Date: {new Date(rx.createdAt).toLocaleDateString()}</span>
+              <span className="text-primary font-bold">FEFO Verified</span>
             </div>
           </div>
         ))}
