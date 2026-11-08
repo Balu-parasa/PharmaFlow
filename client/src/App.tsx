@@ -93,8 +93,8 @@ export function App() {
           lowStockCount={lowStockCount}
         />
 
-        <main className="flex-1 p-6 sm:p-8 lg:p-8 xl:p-10 overflow-y-auto">
-          <div className="max-w-[1700px] w-full mx-auto">
+        <main className="flex-1 p-5 sm:p-6 lg:p-7 overflow-y-auto">
+          <div className="w-full">
             {currentTab === 'dashboard' && <Dashboard onNavigateTab={setCurrentTab} />}
             {currentTab === 'pos' && <POS />}
             {currentTab === 'medicines' && <MedicinesCatalogue />}

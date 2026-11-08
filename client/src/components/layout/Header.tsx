@@ -11,19 +11,19 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ title, user, nearExpiryCount, lowStockCount }) => {
   return (
-    <header className="h-20 bg-white border-b border-slate-200/80 px-8 flex items-center justify-between sticky top-0 z-20 shadow-[0_4px_20px_rgba(0,0,0,0.02)] backdrop-blur-md bg-white/95">
+    <header className="h-16 bg-white border-b border-slate-200/80 px-6 sm:px-8 flex items-center justify-between sticky top-0 z-20 backdrop-blur-md bg-white/95 shadow-sm">
       
       {/* Title */}
-      <div className="flex items-center space-x-3.5">
-        <h2 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">{title}</h2>
+      <div className="flex items-center space-x-3">
+        <h2 className="text-base sm:text-lg font-bold text-slate-800 tracking-tight">{title}</h2>
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-3.5">
         {/* Real-time Alerts Pill */}
         {(nearExpiryCount > 0 || lowStockCount > 0) && (
-          <div className="flex items-center space-x-2 bg-amber-50 border border-amber-200 text-amber-900 text-xs px-4 py-2 rounded-2xl font-bold shadow-sm">
-            <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 animate-bounce" />
+          <div className="flex items-center space-x-2 bg-amber-50 border border-amber-200 text-amber-800 text-xs px-3 py-1.5 rounded-xl font-semibold">
+            <AlertTriangle className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
             <span>
               {nearExpiryCount > 0 && `${nearExpiryCount} Near Expiry`}
               {nearExpiryCount > 0 && lowStockCount > 0 && ' • '}
@@ -33,19 +33,19 @@ export const Header: React.FC<HeaderProps> = ({ title, user, nearExpiryCount, lo
         )}
 
         {/* System Online Status */}
-        <div className="hidden sm:flex items-center space-x-2 text-xs text-slate-600 bg-slate-50 px-4 py-2 rounded-2xl font-bold border border-slate-200/70">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+        <div className="hidden sm:flex items-center space-x-2 text-xs text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl font-medium border border-slate-200/60">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>FEFO Engine Online</span>
         </div>
 
         {/* Current user badge */}
-        <div className="flex items-center space-x-3 pl-4 border-l border-slate-200">
-          <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black text-sm shadow-sm border border-primary/20">
+        <div className="flex items-center space-x-2.5 pl-3 border-l border-slate-200">
+          <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center font-bold text-xs border border-primary/20">
             {user?.name?.charAt(0) || 'U'}
           </div>
           <div className="hidden md:block text-left">
-            <p className="text-xs font-black text-slate-900 leading-tight">{user?.name}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">{user?.role}</p>
+            <p className="text-xs font-semibold text-slate-800 leading-tight">{user?.name}</p>
+            <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{user?.role}</p>
           </div>
         </div>
       </div>
