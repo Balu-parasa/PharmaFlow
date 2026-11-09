@@ -62,14 +62,12 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-8 md:p-12 lg:p-16 aurora-bg">
-      {/* Outer Floating Master Canvas Card (Exactly like Screenshot) */}
-      <div className="w-full max-w-[1240px] bg-white rounded-[28px] shadow-[0_25px_70px_rgba(30,27,75,0.25)] border border-white/60 overflow-hidden flex flex-col lg:flex-row min-h-[700px] transition-all">
-        
-        {/* ========================================================= */}
-        {/* LEFT PANEL: Clean Modern Glass Auth Card (Approx 45%) */}
-        {/* ========================================================= */}
-        <div className="w-full lg:w-[46%] p-8 sm:p-12 lg:p-14 flex flex-col justify-between bg-white relative">
+    <div className="min-h-screen w-full flex flex-col lg:flex-row bg-white overflow-x-hidden">
+      
+      {/* ========================================================= */}
+      {/* LEFT PANEL: Modern Clean Auth Panel (45%) */}
+      {/* ========================================================= */}
+      <div className="w-full lg:w-[46%] xl:w-[42%] min-h-screen p-6 sm:p-10 lg:p-12 xl:p-14 flex flex-col justify-between bg-white relative z-10 border-r border-slate-100 shadow-[4px_0_24px_rgba(0,0,0,0.02)]">
           
           {/* Subtle grid background on left */}
           <div className="absolute inset-0 grid-pattern opacity-40 pointer-events-none" />
@@ -236,7 +234,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         {/* RIGHT PANEL: Authentic Pharmacy Telemetry Dashboard Preview */}
         {/* Matches reference screenshot cards: Graph Report Today, Top Selling, Over All Revenue */}
         {/* ========================================================= */}
-        <div className="w-full lg:w-[54%] p-8 sm:p-12 lg:p-14 bg-slate-50/60 border-l border-slate-100 flex flex-col justify-between relative overflow-hidden">
+        <div className="w-full lg:w-[54%] xl:w-[58%] min-h-screen p-8 sm:p-12 lg:p-14 xl:p-16 bg-[#F8FAFC] flex flex-col justify-between relative overflow-hidden border-l border-slate-100">
           
           {/* Subtle Grid backdrop */}
           <div className="absolute inset-0 grid-pattern opacity-60 pointer-events-none" />
@@ -424,7 +422,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           </div>
         </div>
 
-      </div>
     </div>
   );
 };
