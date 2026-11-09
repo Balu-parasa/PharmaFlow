@@ -7,10 +7,7 @@ import {
   EyeOff, 
   ShieldCheck, 
   CheckCircle2,
-  Sparkles,
-  ArrowRight,
-  Clock,
-  Activity
+  Sparkles
 } from 'lucide-react';
 import api from '../services/api';
 import { User } from '../types';
@@ -53,150 +50,101 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="h-screen w-full relative flex items-center justify-center p-3 sm:p-6 md:p-8 lg:p-10 overflow-hidden bg-slate-900 select-none">
+    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 relative bg-cover bg-center overflow-x-hidden"
+         style={{ backgroundImage: `url('/doctor-pharmacy-hero.png')` }}>
       
-      {/* Blurred Ambient Pharmacy Background matching photo presentation */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center filter blur-xl scale-110 opacity-60"
-        style={{ backgroundImage: `url('/doctor-pills-hand.jpg')` }}
-      />
-      <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-2xl" />
+      {/* Background Soft Backdrop Blur Overlay for realism */}
+      <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-md" />
 
-      {/* Main Curved White Modal Card (Exact geometry and aesthetic from HiHealth design) */}
-      <div className="relative z-10 w-full max-w-6xl h-full max-h-[760px] bg-white rounded-[32px] sm:rounded-[40px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col lg:flex-row border border-white/60">
+      {/* Main Center White Card matching reference image exactly */}
+      <div className="relative z-10 w-full max-w-[1020px] bg-white rounded-[32px] sm:rounded-[40px] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col md:flex-row border border-white/60">
         
         {/* ========================================================= */}
-        {/* LEFT SIDE: Doctor / Clinical Pharmacy Image (Swapped to Left) */}
+        {/* LEFT COLUMN: Clean Clinical Sign-In Form (50%) */}
         {/* ========================================================= */}
-        <div className="hidden lg:block lg:w-1/2 h-full relative overflow-hidden bg-slate-100">
-          <img 
-            src="/doctor-pills-hand.jpg" 
-            alt="Doctor Holding Pharmaceutical Capsules with Stethoscope"
-            className="w-full h-full object-cover object-center filter brightness-[1.02] contrast-[1.03]"
-          />
-          {/* Subtle gradient vignette blending toward inner divider */}
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-white/20 pointer-events-none" />
-
-          {/* Floating Live Pharmaceutical Intelligence Badge */}
-          <div className="absolute bottom-8 left-8 right-8 p-4 rounded-2xl bg-white/90 backdrop-blur-md border border-white/80 shadow-lg">
-            <div className="flex items-center space-x-3 mb-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-bold text-slate-900">Automated FEFO Batch Intelligence</span>
-              <span className="text-[10px] font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-200">
-                21 CFR Part 11
+        <div className="w-full md:w-1/2 p-7 sm:p-10 lg:p-12 xl:p-14 flex flex-col justify-between bg-white relative z-10">
+          
+          {/* Top Brand Logo */}
+          <div className="flex items-center space-x-2.5">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0284C7] to-[#0EA5E9] flex items-center justify-center text-white shadow-sm flex-shrink-0">
+              <span className="text-xl font-black leading-none">+</span>
+            </div>
+            <div className="flex items-center space-x-1.5">
+              <span className="text-xl font-bold tracking-tight text-[#0EA5E9]">PharmaFlow</span>
+              <span className="text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-200">
+                PRO
               </span>
             </div>
-            <p className="text-[11px] text-slate-600 leading-relaxed font-medium">
-              Eliminate medication dispensing risks, prevent expired inventory losses, and maintain a mathematically verified zero-discrepancy stock ledger.
-            </p>
-          </div>
-        </div>
-
-        {/* ========================================================= */}
-        {/* RIGHT SIDE: Elegant Sign-In Form (Exact HiHealth Design System) */}
-        {/* ========================================================= */}
-        <div className="w-full lg:w-1/2 h-full p-8 sm:p-12 xl:p-16 flex flex-col justify-between overflow-y-auto bg-white">
-          
-          {/* Brand Header */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-md border border-slate-200 overflow-hidden flex-shrink-0">
-                <img 
-                  src="/pharmaflow-logo.png" 
-                  alt="PharmaFlow Capsule Logo" 
-                  className="w-full h-full object-contain scale-110 drop-shadow-[0_2px_6px_rgba(59,104,233,0.4)]"
-                />
-              </div>
-              <div>
-                <span className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-1.5">
-                  PharmaFlow
-                  <span className="text-[9px] font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full">
-                    PRO
-                  </span>
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-1.5 text-xs font-bold text-slate-400">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span className="text-[11px] uppercase tracking-wider">Gateway Secure</span>
-            </div>
           </div>
 
-          {/* Form Core */}
-          <div className="my-auto py-4 max-w-sm w-full mx-auto">
+          {/* Form Middle Body */}
+          <div className="my-auto py-6 max-w-sm w-full mx-auto">
             
-            {/* Title & Subtitle matching HiHealth reference */}
-            <div className="text-center space-y-1.5 mb-7">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <div className="text-center mb-6">
+              <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 tracking-tight">
                 Welcome back
               </h1>
-              <p className="text-xs sm:text-sm text-slate-400 font-medium">
-                Smart pharmacy management and clinical dispensing terminal
+              <p className="text-xs text-slate-400 mt-1.5 font-medium">
+                Smart pharmacy management & FEFO stock dispensation
               </p>
             </div>
 
-            {/* Error Banner */}
+            {/* Error Message */}
             {error && (
-              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-2xl text-rose-700 text-xs flex items-center space-x-2 animate-in fade-in">
+              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center space-x-2 animate-in fade-in">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <span className="font-semibold">{error}</span>
+                <span className="font-medium">{error}</span>
               </div>
             )}
 
-            {/* Sign In Form */}
+            {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                   Email address
                 </label>
-                <div className="relative">
-                  <input
-                    type="email"
-                    required
-                    placeholder="Enter your Email address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20 focus:border-[#0ea5e9] transition-all font-medium"
-                  />
-                </div>
+                <input
+                  type="email"
+                  required
+                  placeholder="Enter your Email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 transition-all font-medium"
+                />
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-xs font-bold text-slate-700">
-                    Password
-                  </label>
-                </div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Password
+                </label>
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
-                    placeholder="••••••••••••"
+                    placeholder="••••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 pr-11 py-3 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]/20 focus:border-[#0ea5e9] transition-all font-medium"
+                    className="w-full px-4 pr-11 py-3 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 transition-all font-medium"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-700 transition-colors"
+                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <div className="mt-1.5">
-                  <span className="text-xs font-semibold text-[#0ea5e9] hover:underline cursor-pointer">
+                <div className="mt-1 text-left">
+                  <span className="text-[11px] font-semibold text-[#0EA5E9] hover:underline cursor-pointer">
                     forgot password?
                   </span>
                 </div>
               </div>
 
-              {/* Pill-shaped Blue Button (Exact HiHealth Style) */}
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-[#0ea5e9] hover:bg-[#0284c7] text-white font-bold rounded-full text-sm shadow-[0_8px_20px_rgba(14,165,233,0.35)] transition-all flex items-center justify-center space-x-2 mt-4 cursor-pointer active:scale-[0.99]"
+                className="w-full py-3 bg-[#0098FF] hover:bg-[#0086E6] text-white font-bold rounded-xl text-sm shadow-[0_6px_18px_rgba(0,152,255,0.35)] transition-all flex items-center justify-center space-x-2 mt-2 cursor-pointer active:scale-[0.99]"
               >
                 {loading ? (
                   <div className="flex items-center space-x-2">
@@ -207,66 +155,58 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                   <span>Login account</span>
                 )}
               </button>
-
-              <div className="text-center text-xs text-slate-500 font-medium pt-1">
-                Don't you have any account?{' '}
-                <span className="text-[#0ea5e9] font-bold hover:underline cursor-pointer">
-                  Sign up
-                </span>
-              </div>
             </form>
 
-            {/* OR Divider from HiHealth Design */}
-            <div className="relative my-5">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center text-xs">
-                <span className="bg-white px-3 text-slate-400 font-bold uppercase text-[10px] tracking-wider">
-                  OR
-                </span>
-              </div>
+            <p className="text-[11px] text-slate-500 text-center mt-3 font-medium">
+              Don't you have any account?{' '}
+              <span className="text-[#0EA5E9] font-bold hover:underline cursor-pointer">
+                Sign up
+              </span>
+            </p>
+
+            {/* Divider OR */}
+            <div className="relative my-4 flex items-center justify-center">
+              <div className="border-t border-slate-200 w-full absolute" />
+              <span className="bg-white px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest relative z-10">
+                OR
+              </span>
             </div>
 
-            {/* Quick Demo Access Buttons matching the Google-pill border button */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">
-                <span>Instant Demo Access</span>
-                <span className="text-[#0ea5e9]">One-Click Fill</span>
+            {/* Instant Demo Role Switcher Buttons */}
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center mb-2">
+                Instant Demo Access
               </div>
-              
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => handleFillDemo('admin@pharmaflow.com', 'AdminPassword123!')}
-                  className={`py-2 px-2.5 rounded-full text-xs font-bold border transition-all text-center cursor-pointer ${
+                  className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
                     email === 'admin@pharmaflow.com'
                       ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
-                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white'
                   }`}
                 >
                   Admin
                 </button>
-
                 <button
                   type="button"
                   onClick={() => handleFillDemo('pharmacist@pharmaflow.com', 'PharmPassword123!')}
-                  className={`py-2 px-2.5 rounded-full text-xs font-bold border transition-all text-center cursor-pointer ${
+                  className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
                     email === 'pharmacist@pharmaflow.com'
-                      ? 'bg-[#0ea5e9] text-white border-[#0ea5e9] shadow-sm'
-                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                      ? 'bg-[#0098FF] text-white border-[#0098FF] shadow-sm'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white'
                   }`}
                 >
                   Pharmacist
                 </button>
-
                 <button
                   type="button"
                   onClick={() => handleFillDemo('cashier@pharmaflow.com', 'CashierPassword123!')}
-                  className={`py-2 px-2.5 rounded-full text-xs font-bold border transition-all text-center cursor-pointer ${
+                  className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
                     email === 'cashier@pharmaflow.com'
                       ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
-                      : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
+                      : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white'
                   }`}
                 >
                   Cashier
@@ -276,11 +216,43 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
           </div>
 
-          {/* Bottom Footer */}
-          <div className="text-[11px] font-medium text-slate-400 text-center pt-4 border-t border-slate-100">
-            PharmaFlow Smart Pharmacy System • ALGIONS AI LABS Assessment
+          {/* Left Footer */}
+          <div className="pt-2 text-[10px] text-slate-400 text-center font-medium">
+            21 CFR Part 11 Compliant • TLS 256-Bit Encrypted
           </div>
 
+        </div>
+
+        {/* ========================================================= */}
+        {/* RIGHT COLUMN: Realistic Clinical Doctor & Medication Photo (50%) */}
+        {/* ========================================================= */}
+        <div className="hidden md:block w-1/2 relative bg-slate-50 overflow-hidden">
+          <img 
+            src="/doctor-hero-isolated.png" 
+            alt="Clinical Pharmacist Dispensing Medicine" 
+            className="w-full h-full object-cover object-center"
+          />
+
+          {/* Floating Realistic Telemetry Pill Badges */}
+          <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-lg border border-white/80 max-w-[210px] space-y-1">
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[11px] font-bold text-slate-800">FEFO Engine Active</span>
+            </div>
+            <p className="text-[10px] text-slate-500 leading-tight">
+              Earliest-expiring batch automatically allocated for patient safety.
+            </p>
+          </div>
+
+          <div className="absolute bottom-6 left-6 bg-slate-900/80 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-white/10 flex items-center space-x-3 text-white">
+            <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center text-[#0EA5E9]">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="text-xs font-bold">PharmaFlow Clinical Suite</p>
+              <p className="text-[10px] text-slate-300">Zero Medication Dispense Errors</p>
+            </div>
+          </div>
         </div>
 
       </div>
