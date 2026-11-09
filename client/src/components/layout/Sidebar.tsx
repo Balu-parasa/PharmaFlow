@@ -60,11 +60,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab, use
       {/* Brand Header */}
       <div className="p-4 sm:p-5 border-b border-slate-800/70 flex items-center justify-between bg-[#08111B]/60">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-md overflow-hidden flex-shrink-0 border border-white/20">
+          <div className="w-12 h-12 rounded-2xl bg-white/10 p-2 flex items-center justify-center shadow-md overflow-hidden flex-shrink-0 border border-white/15 backdrop-blur-sm">
             <img 
               src="/pharmaflow-logo.png" 
               alt="PharmaFlow Logo" 
-              className="w-full h-full object-contain scale-110"
+              className="w-full h-full object-contain drop-shadow-[0_2px_8px_rgba(59,104,233,0.5)] transform scale-110"
             />
           </div>
           <div>
