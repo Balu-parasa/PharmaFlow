@@ -451,7 +451,7 @@ export const POS: React.FC = () => {
 
       {/* Sale Invoice Modal on Success */}
       {successSale && (
-        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
+        <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
           <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 text-center animate-in zoom-in-95 duration-150 border border-slate-100">
             <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3 shadow-sm">
               <CheckCircle className="w-7 h-7" />

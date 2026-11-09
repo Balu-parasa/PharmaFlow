@@ -373,7 +373,7 @@ export const Inventory: React.FC = () => {
 
       {/* Modal: Add Medicine */}
       {showAddMedicineModal && (
-        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
+        <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
           <form
             onSubmit={handleCreateMedicine}
             className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
@@ -464,7 +464,7 @@ export const Inventory: React.FC = () => {
 
       {/* Modal: Add Batch */}
       {showAddBatchModal && (
-        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
+        <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
           <form
             onSubmit={handleCreateBatch}
             className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[92vh] overflow-y-auto border border-slate-100 animate-in fade-in zoom-in-95 duration-200"

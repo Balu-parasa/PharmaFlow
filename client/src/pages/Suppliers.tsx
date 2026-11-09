@@ -269,7 +269,7 @@ export const Suppliers: React.FC = () => {
 
       {/* Modal Add Supplier */}
       {showModal && (
-        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
+        <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
           <form
             onSubmit={handleSubmit}
             className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
@@ -366,7 +366,7 @@ export const Suppliers: React.FC = () => {
 
       {/* Modal: Receive Purchase Order Multi-Batch */}
       {showPurchaseModal && (
-        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
+        <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
           <form
             onSubmit={handlePurchaseSubmit}
             className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full p-6 space-y-4 max-h-[92vh] overflow-y-auto border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
