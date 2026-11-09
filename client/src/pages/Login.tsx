@@ -77,8 +77,12 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
           {/* Top Logo Bar */}
           <div className="relative z-10 flex items-center justify-between">
             <div className="flex items-center space-x-2.5">
-              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center text-white shadow-md shadow-primary/30">
-                <Pill className="w-5 h-5 text-white" />
+              <div className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-md border border-slate-100 overflow-hidden flex-shrink-0">
+                <img 
+                  src="/pharmaflow-logo.png" 
+                  alt="PharmaFlow Logo" 
+                  className="w-full h-full object-contain"
+                />
               </div>
               <span className="text-xl font-black text-slate-900 tracking-tight">PharmaFlow</span>
             </div>
