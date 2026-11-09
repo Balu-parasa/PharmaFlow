@@ -102,7 +102,7 @@ export const SalesHistory: React.FC = () => {
 
       {/* Invoice Detail Modal */}
       {selectedSale && (
-        <div className="fixed inset-0 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
+        <div className="fixed inset-0 z-[100] backdrop-blur-md flex items-center justify-center p-4 transition-all">
           <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 text-xs space-y-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between border-b pb-3">
               <div>
