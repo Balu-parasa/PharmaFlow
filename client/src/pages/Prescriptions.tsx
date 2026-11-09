@@ -325,7 +325,7 @@ export const Prescriptions: React.FC = () => {
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded text-xs font-semibold"
+                className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm"
               >
                 Save Prescription
               </button>

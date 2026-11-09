@@ -58,13 +58,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab, use
     <aside className="w-64 bg-[#0B1724] text-white flex flex-col h-screen sticky top-0 border-r border-slate-800/80 select-none shadow-[2px_0_12px_rgba(0,0,0,0.12)] z-30">
       
       {/* Brand Header */}
-      <div className="p-5 border-b border-slate-800/70 flex items-center justify-between bg-[#08111B]/60">
+      <div className="p-4 sm:p-5 border-b border-slate-800/70 flex items-center justify-between bg-[#08111B]/60">
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-white p-1 flex items-center justify-center shadow-sm overflow-hidden flex-shrink-0">
+          <div className="w-12 h-12 rounded-2xl bg-white p-1.5 flex items-center justify-center shadow-md overflow-hidden flex-shrink-0 border border-white/20">
             <img 
               src="/pharmaflow-logo.png" 
               alt="PharmaFlow Logo" 
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain scale-110"
             />
           </div>
           <div>

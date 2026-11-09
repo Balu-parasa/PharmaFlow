@@ -112,35 +112,35 @@ export const Inventory: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Action Header & Tabs */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         {/* Navigation Tabs */}
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setActiveTab('medicines')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
               activeTab === 'medicines'
-                ? 'bg-brand-600 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-primary text-white shadow-sm font-extrabold'
+                : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/60'
             }`}
           >
             All Medicines ({medicines.length})
           </button>
           <button
             onClick={() => setActiveTab('batches')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
               activeTab === 'batches'
-                ? 'bg-brand-600 text-white shadow-sm'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-primary text-white shadow-sm font-extrabold'
+                : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/60'
             }`}
           >
             All Batches ({batches.length})
           </button>
           <button
             onClick={() => setActiveTab('alerts')}
-            className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center space-x-1.5 ${
+            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center space-x-1.5 ${
               activeTab === 'alerts'
-                ? 'bg-rose-600 text-white shadow-sm'
-                : 'text-rose-600 hover:bg-rose-50'
+                ? 'bg-rose-600 text-white shadow-sm font-extrabold'
+                : 'bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/60'
             }`}
           >
             <AlertTriangle className="w-4 h-4" />
@@ -149,17 +149,17 @@ export const Inventory: React.FC = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5">
           <button
             onClick={() => setShowAddBatchModal(true)}
-            className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition-colors"
+            className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold flex items-center space-x-1.5 transition-all border border-slate-200/70 shadow-sm"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-slate-600" />
             <span>Receive New Batch</span>
           </button>
           <button
             onClick={() => setShowAddMedicineModal(true)}
-            className="px-3.5 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-sm transition-colors"
+            className="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold flex items-center space-x-1.5 shadow-sm transition-all"
           >
             <Plus className="w-4 h-4" />
             <span>Add New Medicine</span>
@@ -447,13 +447,13 @@ export const Inventory: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setShowAddMedicineModal(false)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded text-xs font-semibold"
+                className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm"
               >
                 Save Medicine
               </button>
@@ -467,9 +467,14 @@ export const Inventory: React.FC = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <form
             onSubmit={handleCreateBatch}
-            className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4"
+            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[92vh] overflow-y-auto border border-slate-100"
           >
-            <h3 className="text-lg font-bold text-slate-800">Receive Stock Batch</h3>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 className="text-base font-bold text-slate-800">Receive Stock Batch</h3>
+              <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                FEFO Ready
+              </span>
+            </div>
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div className="col-span-2">
                 <label className="block text-slate-600 font-medium mb-1">Select Medicine *</label>
@@ -477,7 +482,7 @@ export const Inventory: React.FC = () => {
                   required
                   value={newBatch.medicineId}
                   onChange={(e) => setNewBatch({ ...newBatch, medicineId: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:border-primary focus:outline-none bg-slate-50 text-xs"
                 >
                   <option value="">-- Choose Medicine --</option>
                   {medicines.map((m) => (
@@ -495,7 +500,7 @@ export const Inventory: React.FC = () => {
                   placeholder="e.g. BATCH-2024-X"
                   value={newBatch.batchNumber}
                   onChange={(e) => setNewBatch({ ...newBatch, batchNumber: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded font-mono"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono focus:border-primary focus:outline-none text-xs"
                 />
               </div>
               <div>
@@ -505,7 +510,7 @@ export const Inventory: React.FC = () => {
                   required
                   value={newBatch.expiryDate}
                   onChange={(e) => setNewBatch({ ...newBatch, expiryDate: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:border-primary focus:outline-none text-xs"
                 />
               </div>
               <div>
@@ -516,7 +521,7 @@ export const Inventory: React.FC = () => {
                   required
                   value={newBatch.costPrice}
                   onChange={(e) => setNewBatch({ ...newBatch, costPrice: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:border-primary focus:outline-none text-xs"
                 />
               </div>
               <div>
@@ -527,7 +532,7 @@ export const Inventory: React.FC = () => {
                   required
                   value={newBatch.sellingPrice}
                   onChange={(e) => setNewBatch({ ...newBatch, sellingPrice: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:border-primary focus:outline-none text-xs"
                 />
               </div>
               <div className="col-span-2">
@@ -538,24 +543,24 @@ export const Inventory: React.FC = () => {
                   required
                   value={newBatch.quantity}
                   onChange={(e) => setNewBatch({ ...newBatch, quantity: Number(e.target.value) })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:border-primary focus:outline-none text-xs"
                 />
               </div>
             </div>
 
-            <div className="flex justify-end space-x-2 pt-3 border-t">
+            <div className="flex items-center justify-end space-x-2.5 pt-4 border-t border-slate-100">
               <button
                 type="button"
                 onClick={() => setShowAddBatchModal(false)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded text-xs font-semibold"
+                className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm transition-all"
               >
-                Save Batch
+                Save & Restock Batch
               </button>
             </div>
           </form>

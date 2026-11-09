@@ -176,9 +176,9 @@ export const SalesHistory: React.FC = () => {
               </button>
               <button
                 onClick={() => setSelectedSale(null)}
-                className="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded font-semibold"
+                className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm"
               >
-                Close
+                Close Receipt
               </button>
             </div>
           </div>
