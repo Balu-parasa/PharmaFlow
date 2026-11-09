@@ -237,10 +237,10 @@ export const MedicinesCatalogue: React.FC = () => {
 
       {/* Modal: Add/Edit Medicine */}
       {showModal && (
-        <div className="fixed inset-0 bg-primary/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <form
             onSubmit={handleSubmit}
-            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4"
+            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-100"
           >
             <div className="flex items-center justify-between border-b pb-3">
               <h3 className="text-base font-extrabold text-textPrimary">
