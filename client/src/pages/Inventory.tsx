@@ -373,10 +373,10 @@ export const Inventory: React.FC = () => {
 
       {/* Modal: Add Medicine */}
       {showAddMedicineModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
           <form
             onSubmit={handleCreateMedicine}
-            className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 space-y-4"
+            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
           >
             <h3 className="text-lg font-bold text-slate-800">Add New Medicine to Catalog</h3>
             <div className="grid grid-cols-2 gap-3 text-xs">
@@ -464,10 +464,10 @@ export const Inventory: React.FC = () => {
 
       {/* Modal: Add Batch */}
       {showAddBatchModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-slate-950/40 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all">
           <form
             onSubmit={handleCreateBatch}
-            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[92vh] overflow-y-auto border border-slate-100"
+            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[92vh] overflow-y-auto border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 className="text-base font-bold text-slate-800">Receive Stock Batch</h3>
