@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import { Medicine, Batch } from '../types';
+import { ModalPortal } from '../components/ModalPortal';
 
 export const Inventory: React.FC = () => {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
@@ -373,130 +374,133 @@ export const Inventory: React.FC = () => {
 
       {/* Modal: Add Medicine */}
       {showAddMedicineModal && (
-        <div className="fixed inset-0 z-[100] backdrop-blur-md flex items-center justify-center p-4 transition-all">
-          <form
-            onSubmit={handleCreateMedicine}
-            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
-          >
-            <h3 className="text-lg font-bold text-slate-800">Add New Medicine to Catalog</h3>
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="col-span-2">
-                <label className="block text-slate-600 font-medium mb-1">Brand Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={newMed.name}
-                  onChange={(e) => setNewMed({ ...newMed, name: e.target.value })}
-                  placeholder="e.g. Paracetamol 500"
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
-                />
+        <ModalPortal>
+          <div className="fixed inset-0 z-[9999] backdrop-blur-md flex items-center justify-center p-4 transition-all">
+            <form
+              onSubmit={handleCreateMedicine}
+              className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
+            >
+              <h3 className="text-lg font-bold text-slate-800">Add New Medicine to Catalog</h3>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="col-span-2">
+                  <label className="block text-slate-600 font-medium mb-1">Brand Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newMed.name}
+                    onChange={(e) => setNewMed({ ...newMed, name: e.target.value })}
+                    placeholder="e.g. Paracetamol 500"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-600 font-medium mb-1">Generic Name</label>
+                  <input
+                    type="text"
+                    value={newMed.genericName}
+                    onChange={(e) => setNewMed({ ...newMed, genericName: e.target.value })}
+                    placeholder="e.g. Acetaminophen"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-600 font-medium mb-1">SKU *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newMed.sku}
+                    onChange={(e) => setNewMed({ ...newMed, sku: e.target.value })}
+                    placeholder="e.g. MED-PCM-500"
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-600 font-medium mb-1">Category</label>
+                  <select
+                    value={newMed.category}
+                    onChange={(e) => setNewMed({ ...newMed, category: e.target.value })}
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  >
+                    <option>Antibiotics</option>
+                    <option>Analgesics & Antipyretics</option>
+                    <option>Antihistamines</option>
+                    <option>Gastrointestinal</option>
+                    <option>Cardiovascular</option>
+                    <option>Respiratory</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-600 font-medium mb-1">Dosage Form</label>
+                  <select
+                    value={newMed.dosageForm}
+                    onChange={(e) => setNewMed({ ...newMed, dosageForm: e.target.value })}
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  >
+                    <option>Tablet</option>
+                    <option>Syrup</option>
+                    <option>Capsule</option>
+                    <option>Injection</option>
+                    <option>Ointment</option>
+                  </select>
+                </div>
               </div>
-              <div>
-                <label className="block text-slate-600 font-medium mb-1">Generic Name</label>
-                <input
-                  type="text"
-                  value={newMed.genericName}
-                  onChange={(e) => setNewMed({ ...newMed, genericName: e.target.value })}
-                  placeholder="e.g. Acetaminophen"
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-600 font-medium mb-1">SKU *</label>
-                <input
-                  type="text"
-                  required
-                  value={newMed.sku}
-                  onChange={(e) => setNewMed({ ...newMed, sku: e.target.value })}
-                  placeholder="e.g. MED-PCM-500"
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-600 font-medium mb-1">Category</label>
-                <select
-                  value={newMed.category}
-                  onChange={(e) => setNewMed({ ...newMed, category: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
-                >
-                  <option>Antibiotics</option>
-                  <option>Analgesics & Antipyretics</option>
-                  <option>Antihistamines</option>
-                  <option>Gastrointestinal</option>
-                  <option>Cardiovascular</option>
-                  <option>Respiratory</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-slate-600 font-medium mb-1">Dosage Form</label>
-                <select
-                  value={newMed.dosageForm}
-                  onChange={(e) => setNewMed({ ...newMed, dosageForm: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
-                >
-                  <option>Tablet</option>
-                  <option>Syrup</option>
-                  <option>Capsule</option>
-                  <option>Injection</option>
-                  <option>Ointment</option>
-                </select>
-              </div>
-            </div>
 
-            <div className="flex justify-end space-x-2 pt-3 border-t">
-              <button
-                type="button"
-                onClick={() => setShowAddMedicineModal(false)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm"
-              >
-                Save Medicine
-              </button>
-            </div>
-          </form>
-        </div>
+              <div className="flex justify-end space-x-2 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowAddMedicineModal(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm"
+                >
+                  Save Medicine
+                </button>
+              </div>
+            </form>
+          </div>
+        </ModalPortal>
       )}
 
       {/* Modal: Add Batch */}
       {showAddBatchModal && (
-        <div className="fixed inset-0 z-[100] backdrop-blur-md flex items-center justify-center p-4 transition-all">
-          <form
-            onSubmit={handleCreateBatch}
-            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[92vh] overflow-y-auto border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
-          >
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <h3 className="text-base font-bold text-slate-800">Receive Stock Batch</h3>
-              <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                FEFO Ready
-              </span>
-            </div>
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="col-span-2">
-                <label className="block text-slate-600 font-medium mb-1">Select Medicine *</label>
-                <select
-                  required
-                  value={newBatch.medicineId}
-                  onChange={(e) => setNewBatch({ ...newBatch, medicineId: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:border-primary focus:outline-none bg-slate-50 text-xs"
-                >
-                  <option value="">-- Choose Medicine --</option>
-                  {medicines.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.name} ({m.dosageForm}) - SKU: {m.sku}
-                    </option>
-                  ))}
-                </select>
+        <ModalPortal>
+          <div className="fixed inset-0 z-[9999] backdrop-blur-md flex items-center justify-center p-4 transition-all">
+            <form
+              onSubmit={handleCreateBatch}
+              className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[92vh] overflow-y-auto border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
+            >
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 className="text-base font-bold text-slate-800">Receive Stock Batch</h3>
+                <span className="text-[10px] font-bold bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  FEFO Ready
+                </span>
               </div>
-              <div>
-                <label className="block text-slate-600 font-medium mb-1">Batch Number *</label>
-                <input
-                  type="text"
-                  required
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="col-span-2">
+                  <label className="block text-slate-600 font-medium mb-1">Select Medicine *</label>
+                  <select
+                    required
+                    value={newBatch.medicineId}
+                    onChange={(e) => setNewBatch({ ...newBatch, medicineId: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-300 rounded-xl focus:border-primary focus:outline-none bg-slate-50 text-xs"
+                  >
+                    <option value="">-- Choose Medicine --</option>
+                    {medicines.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.name} ({m.dosageForm}) - SKU: {m.sku}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-slate-600 font-medium mb-1">Batch Number *</label>
+                  <input
+                    type="text"
+                    required
                   placeholder="e.g. BATCH-2024-X"
                   value={newBatch.batchNumber}
                   onChange={(e) => setNewBatch({ ...newBatch, batchNumber: e.target.value })}
@@ -565,6 +569,7 @@ export const Inventory: React.FC = () => {
             </div>
           </form>
         </div>
+        </ModalPortal>
       )}
     </div>
   );

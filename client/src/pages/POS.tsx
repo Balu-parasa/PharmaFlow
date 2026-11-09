@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import { Medicine, CartItem, Sale } from '../types';
+import { ModalPortal } from '../components/ModalPortal';
 
 export const POS: React.FC = () => {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
@@ -451,46 +452,48 @@ export const POS: React.FC = () => {
 
       {/* Sale Invoice Modal on Success */}
       {successSale && (
-        <div className="fixed inset-0 z-[100] backdrop-blur-md flex items-center justify-center p-4 transition-all">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 text-center animate-in zoom-in-95 duration-150 border border-slate-100">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3 shadow-sm">
-              <CheckCircle className="w-7 h-7" />
-            </div>
-            <h3 className="text-xl font-black text-slate-900">Sale Successfully Completed!</h3>
-            <p className="text-xs text-slate-400 mt-0.5 font-mono">Invoice #{successSale.invoiceNumber}</p>
+        <ModalPortal>
+          <div className="fixed inset-0 z-[9999] backdrop-blur-md flex items-center justify-center p-4 transition-all">
+            <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 text-center animate-in zoom-in-95 duration-150 border border-slate-100">
+              <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-3 shadow-sm">
+                <CheckCircle className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-black text-slate-900">Sale Successfully Completed!</h3>
+              <p className="text-xs text-slate-400 mt-0.5 font-mono">Invoice #{successSale.invoiceNumber}</p>
 
-            <div className="my-5 p-4 bg-slate-50 rounded-2xl text-left text-xs space-y-1.5 border border-slate-200/80">
-              <div className="flex justify-between">
-                <span className="text-slate-400 font-semibold">Total Amount:</span>
-                <span className="font-black text-slate-900">₹{successSale.totalAmount.toFixed(2)}</span>
+              <div className="my-5 p-4 bg-slate-50 rounded-2xl text-left text-xs space-y-1.5 border border-slate-200/80">
+                <div className="flex justify-between">
+                  <span className="text-slate-400 font-semibold">Total Amount:</span>
+                  <span className="font-black text-slate-900">₹{successSale.totalAmount.toFixed(2)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400 font-semibold">Payment Method:</span>
+                  <span className="font-bold text-slate-700">{successSale.paymentMethod}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400 font-semibold">Customer:</span>
+                  <span className="font-bold text-slate-700">{successSale.customer?.name || 'Walk-in'}</span>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400 font-semibold">Payment Method:</span>
-                <span className="font-bold text-slate-700">{successSale.paymentMethod}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-400 font-semibold">Customer:</span>
-                <span className="font-bold text-slate-700">{successSale.customer?.name || 'Walk-in'}</span>
-              </div>
-            </div>
 
-            <div className="flex space-x-3">
-              <button
-                onClick={() => window.print()}
-                className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5"
-              >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Print Receipt</span>
-              </button>
-              <button
-                onClick={() => setSuccessSale(null)}
-                className="flex-1 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-primary/20"
-              >
-                Next Customer
-              </button>
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => window.print()}
+                  className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all flex items-center justify-center space-x-1.5"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print Receipt</span>
+                </button>
+                <button
+                  onClick={() => setSuccessSale(null)}
+                  className="flex-1 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-primary/20"
+                >
+                  Next Customer
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
     </div>
   );

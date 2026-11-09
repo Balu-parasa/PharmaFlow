@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FileText, UserCheck, CheckCircle2, Clock, Plus, Search } from 'lucide-react';
 import api from '../services/api';
 import { Prescription, Medicine } from '../types';
+import { ModalPortal } from '../components/ModalPortal';
 
 export const Prescriptions: React.FC = () => {
   const [prescriptions, setPrescriptions] = useState<Prescription[]>([]);
@@ -200,138 +201,140 @@ export const Prescriptions: React.FC = () => {
 
       {/* New Rx Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] backdrop-blur-md flex items-center justify-center p-4 transition-all">
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
-          >
-            <h3 className="text-lg font-bold text-slate-800">Add New Prescription</h3>
+        <ModalPortal>
+          <div className="fixed inset-0 z-[9999] backdrop-blur-md flex items-center justify-center p-4 transition-all">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
+            >
+              <h3 className="text-lg font-bold text-slate-800">Add New Prescription</h3>
 
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div>
-                <label className="block text-slate-600 font-medium mb-1">Patient Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={newRx.customerName}
-                  onChange={(e) => setNewRx({ ...newRx, customerName: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-600 font-medium mb-1">Patient Phone</label>
-                <input
-                  type="text"
-                  value={newRx.customerPhone}
-                  onChange={(e) => setNewRx({ ...newRx, customerPhone: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-600 font-medium mb-1">Doctor Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={newRx.doctorName}
-                  onChange={(e) => setNewRx({ ...newRx, doctorName: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-slate-600 font-medium mb-1">Doctor License / Reg No.</label>
-                <input
-                  type="text"
-                  value={newRx.doctorLicense}
-                  onChange={(e) => setNewRx({ ...newRx, doctorLicense: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
-                />
-              </div>
-              <div className="col-span-2">
-                <label className="block text-slate-600 font-medium mb-1">Hospital / Clinic</label>
-                <input
-                  type="text"
-                  value={newRx.clinicHospital}
-                  onChange={(e) => setNewRx({ ...newRx, clinicHospital: e.target.value })}
-                  className="w-full px-3 py-1.5 border border-slate-300 rounded"
-                />
-              </div>
-            </div>
-
-            {/* Prescribed Items section */}
-            <div className="pt-2 border-t">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-slate-700">Prescription Medicines</span>
-                <button
-                  type="button"
-                  onClick={handleAddItem}
-                  className="text-xs text-brand-600 font-bold hover:underline"
-                >
-                  + Add Another Medicine
-                </button>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div>
+                  <label className="block text-slate-600 font-medium mb-1">Patient Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newRx.customerName}
+                    onChange={(e) => setNewRx({ ...newRx, customerName: e.target.value })}
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-600 font-medium mb-1">Patient Phone</label>
+                  <input
+                    type="text"
+                    value={newRx.customerPhone}
+                    onChange={(e) => setNewRx({ ...newRx, customerPhone: e.target.value })}
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-600 font-medium mb-1">Doctor Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={newRx.doctorName}
+                    onChange={(e) => setNewRx({ ...newRx, doctorName: e.target.value })}
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-600 font-medium mb-1">Doctor License / Reg No.</label>
+                  <input
+                    type="text"
+                    value={newRx.doctorLicense}
+                    onChange={(e) => setNewRx({ ...newRx, doctorLicense: e.target.value })}
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-slate-600 font-medium mb-1">Hospital / Clinic</label>
+                  <input
+                    type="text"
+                    value={newRx.clinicHospital}
+                    onChange={(e) => setNewRx({ ...newRx, clinicHospital: e.target.value })}
+                    className="w-full px-3 py-1.5 border border-slate-300 rounded"
+                  />
+                </div>
               </div>
 
-              {newRx.items.map((item, idx) => (
-                <div key={idx} className="p-3 bg-slate-50 rounded mb-2 border space-y-2 text-xs">
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="col-span-2">
-                      <select
-                        required
-                        value={item.medicineId}
-                        onChange={(e) => handleItemChange(idx, 'medicineId', e.target.value)}
-                        className="w-full px-2 py-1 border rounded bg-white"
-                      >
-                        <option value="">-- Select Medicine --</option>
-                        {medicines.map((m) => (
-                          <option key={m.id} value={m.id}>
-                            {m.name} ({m.dosageForm})
-                          </option>
-                        ))}
-                      </select>
+              {/* Prescribed Items section */}
+              <div className="pt-2 border-t">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold text-slate-700">Prescription Medicines</span>
+                  <button
+                    type="button"
+                    onClick={handleAddItem}
+                    className="text-xs text-brand-600 font-bold hover:underline"
+                  >
+                    + Add Another Medicine
+                  </button>
+                </div>
+
+                {newRx.items.map((item, idx) => (
+                  <div key={idx} className="p-3 bg-slate-50 rounded mb-2 border space-y-2 text-xs">
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="col-span-2">
+                        <select
+                          required
+                          value={item.medicineId}
+                          onChange={(e) => handleItemChange(idx, 'medicineId', e.target.value)}
+                          className="w-full px-2 py-1 border rounded bg-white"
+                        >
+                          <option value="">-- Select Medicine --</option>
+                          {medicines.map((m) => (
+                            <option key={m.id} value={m.id}>
+                              {m.name} ({m.dosageForm})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <input
+                          type="number"
+                          min="1"
+                          required
+                          placeholder="Qty"
+                          value={item.quantityRequired}
+                          onChange={(e) =>
+                            handleItemChange(idx, 'quantityRequired', Number(e.target.value))
+                          }
+                          className="w-full px-2 py-1 border rounded bg-white text-center"
+                        />
+                      </div>
                     </div>
                     <div>
                       <input
-                        type="number"
-                        min="1"
-                        required
-                        placeholder="Qty"
-                        value={item.quantityRequired}
-                        onChange={(e) =>
-                          handleItemChange(idx, 'quantityRequired', Number(e.target.value))
-                        }
-                        className="w-full px-2 py-1 border rounded bg-white text-center"
+                        type="text"
+                        placeholder="Dosage instruction (e.g. 1 tab morning & night)"
+                        value={item.dosageInstructions}
+                        onChange={(e) => handleItemChange(idx, 'dosageInstructions', e.target.value)}
+                        className="w-full px-2 py-1 border rounded bg-white"
                       />
                     </div>
                   </div>
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Dosage instruction (e.g. 1 tab morning & night)"
-                      value={item.dosageInstructions}
-                      onChange={(e) => handleItemChange(idx, 'dosageInstructions', e.target.value)}
-                      className="w-full px-2 py-1 border rounded bg-white"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            <div className="flex justify-end space-x-2 pt-3 border-t">
-              <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm"
-              >
-                Save Prescription
-              </button>
-            </div>
-          </form>
-        </div>
+              <div className="flex justify-end space-x-2 pt-3 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm"
+                >
+                  Save Prescription
+                </button>
+              </div>
+            </form>
+          </div>
+        </ModalPortal>
       )}
     </div>
   );

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Search, Activity, User as UserIcon, Calendar, Eye, CheckCircle2, AlertTriangle, ArrowRightLeft, PackagePlus, FileText, ChevronRight } from 'lucide-react';
 import api from '../services/api';
 import { AuditLog } from '../types';
+import { ModalPortal } from '../components/ModalPortal';
 
 export const AuditTrail: React.FC = () => {
   const [logs, setLogs] = useState<AuditLog[]>([]);
@@ -250,104 +251,106 @@ export const AuditTrail: React.FC = () => {
 
       {/* Audit Detail Modal */}
       {selectedLog && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 backdrop-blur-md animate-fade-in">
-          <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-primary/10 text-primary rounded-2xl">
-                  <ShieldCheck className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-black text-slate-900 tracking-tight">
-                    Audit Record Details
-                  </h3>
-                  <p className="text-xs text-slate-500 font-mono">
-                    ID: {selectedLog.id}
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() => setSelectedLog(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
-                <div>
-                  <span className="text-slate-400 font-semibold block mb-0.5">Timestamp:</span>
-                  <span className="font-bold text-slate-900">
-                    {new Date(selectedLog.createdAt).toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'medium' })}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 font-semibold block mb-0.5">Action:</span>
-                  <span className="font-bold text-slate-900">{selectedLog.action}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 font-semibold block mb-0.5">Authorized User:</span>
-                  <span className="font-bold text-slate-900">
-                    {selectedLog.user ? `${selectedLog.user.name} (${selectedLog.user.role})` : 'System Engine'}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-400 font-semibold block mb-0.5">Target Entity:</span>
-                  <span className="font-bold text-slate-900">{selectedLog.entity}</span>
-                </div>
-              </div>
-
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-                  Parsed Parameter Key-Values
-                </h4>
-                {parseDetails(selectedLog.details) ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    {Object.entries(parseDetails(selectedLog.details)!).map(([k, v]) => (
-                      <div key={k} className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs flex flex-col">
-                        <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
-                          {k.replace(/([A-Z])/g, ' $1')}
-                        </span>
-                        <span className="text-sm font-bold text-slate-900 mt-0.5">
-                          {typeof v === 'boolean'
-                            ? v ? 'True (Verified)' : 'False'
-                            : k.toLowerCase().includes('amount') || k.toLowerCase().includes('total') || k.toLowerCase().includes('price')
-                            ? `₹${Number(v).toLocaleString('en-IN')}`
-                            : String(v)}
-                        </span>
-                      </div>
-                    ))}
+        <ModalPortal>
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 backdrop-blur-md animate-fade-in">
+            <div className="bg-white w-full max-w-xl rounded-3xl shadow-2xl border border-slate-200 overflow-hidden">
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-primary/10 text-primary rounded-2xl">
+                    <ShieldCheck className="w-5 h-5" />
                   </div>
-                ) : (
-                  <div className="p-4 bg-slate-50 rounded-2xl text-xs text-slate-600 font-mono">
-                    {selectedLog.details || 'No additional parameters provided.'}
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                      Audit Record Details
+                    </h3>
+                    <p className="text-xs text-slate-500 font-mono">
+                      ID: {selectedLog.id}
+                    </p>
                   </div>
-                )}
+                </div>
+                <button
+                  onClick={() => setSelectedLog(null)}
+                  className="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                >
+                  ✕
+                </button>
               </div>
 
-              <div>
-                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
-                  Raw JSON Payload
-                </h4>
-                <pre className="p-3 bg-slate-950 text-emerald-400 rounded-xl text-[11px] font-mono overflow-x-auto max-h-40 border border-slate-800">
-                  {selectedLog.details
-                    ? JSON.stringify(parseDetails(selectedLog.details) || selectedLog.details, null, 2)
-                    : '{}'}
-                </pre>
-              </div>
-            </div>
+              <div className="p-6 space-y-4">
+                <div className="grid grid-cols-2 gap-3 text-xs bg-slate-50 p-4 rounded-2xl border border-slate-200/80">
+                  <div>
+                    <span className="text-slate-400 font-semibold block mb-0.5">Timestamp:</span>
+                    <span className="font-bold text-slate-900">
+                      {new Date(selectedLog.createdAt).toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'medium' })}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block mb-0.5">Action:</span>
+                    <span className="font-bold text-slate-900">{selectedLog.action}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block mb-0.5">Authorized User:</span>
+                    <span className="font-bold text-slate-900">
+                      {selectedLog.user ? `${selectedLog.user.name} (${selectedLog.user.role})` : 'System Engine'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 font-semibold block mb-0.5">Target Entity:</span>
+                    <span className="font-bold text-slate-900">{selectedLog.entity}</span>
+                  </div>
+                </div>
 
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-              <button
-                onClick={() => setSelectedLog(null)}
-                className="px-5 py-2 bg-slate-900 text-white font-bold text-xs rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
-              >
-                Close
-              </button>
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                    Parsed Parameter Key-Values
+                  </h4>
+                  {parseDetails(selectedLog.details) ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {Object.entries(parseDetails(selectedLog.details)!).map(([k, v]) => (
+                        <div key={k} className="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs flex flex-col">
+                          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide">
+                            {k.replace(/([A-Z])/g, ' $1')}
+                          </span>
+                          <span className="text-sm font-bold text-slate-900 mt-0.5">
+                            {typeof v === 'boolean'
+                              ? v ? 'True (Verified)' : 'False'
+                              : k.toLowerCase().includes('amount') || k.toLowerCase().includes('total') || k.toLowerCase().includes('price')
+                              ? `₹${Number(v).toLocaleString('en-IN')}`
+                              : String(v)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-4 bg-slate-50 rounded-2xl text-xs text-slate-600 font-mono">
+                      {selectedLog.details || 'No additional parameters provided.'}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">
+                    Raw JSON Payload
+                  </h4>
+                  <pre className="p-3 bg-slate-950 text-emerald-400 rounded-xl text-[11px] font-mono overflow-x-auto max-h-40 border border-slate-800">
+                    {selectedLog.details
+                      ? JSON.stringify(parseDetails(selectedLog.details) || selectedLog.details, null, 2)
+                      : '{}'}
+                  </pre>
+                </div>
+              </div>
+
+              <div className="p-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+                <button
+                  onClick={() => setSelectedLog(null)}
+                  className="px-5 py-2 bg-slate-900 text-white font-bold text-xs rounded-xl hover:bg-slate-800 transition-colors cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
     </div>
   );

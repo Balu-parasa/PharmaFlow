@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Receipt, Search, Printer, Calendar } from 'lucide-react';
 import api from '../services/api';
 import { Sale } from '../types';
+import { ModalPortal } from '../components/ModalPortal';
 
 export const SalesHistory: React.FC = () => {
   const [sales, setSales] = useState<Sale[]>([]);
@@ -102,87 +103,89 @@ export const SalesHistory: React.FC = () => {
 
       {/* Invoice Detail Modal */}
       {selectedSale && (
-        <div className="fixed inset-0 z-[100] backdrop-blur-md flex items-center justify-center p-4 transition-all">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 text-xs space-y-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between border-b pb-3">
-              <div>
-                <h3 className="text-base font-bold text-slate-900">PharmaFlow Pharmacy</h3>
-                <p className="text-slate-400">Invoice: {selectedSale.invoiceNumber}</p>
+        <ModalPortal>
+          <div className="fixed inset-0 z-[9999] backdrop-blur-md flex items-center justify-center p-4 transition-all">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 text-xs space-y-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
+              <div className="flex items-center justify-between border-b pb-3">
+                <div>
+                  <h3 className="text-base font-bold text-slate-900">PharmaFlow Pharmacy</h3>
+                  <p className="text-slate-400">Invoice: {selectedSale.invoiceNumber}</p>
+                </div>
+                <button
+                  onClick={() => setSelectedSale(null)}
+                  className="text-slate-400 hover:text-slate-600 text-lg font-bold"
+                >
+                  ✕
+                </button>
               </div>
-              <button
-                onClick={() => setSelectedSale(null)}
-                className="text-slate-400 hover:text-slate-600 text-lg font-bold"
-              >
-                ✕
-              </button>
-            </div>
 
-            <div className="grid grid-cols-2 gap-2 text-slate-600">
-              <div>
-                <p className="font-semibold text-slate-700">Billed To:</p>
-                <p>{selectedSale.customer?.name || 'Walk-in Customer'}</p>
-                <p>{selectedSale.customer?.phone || ''}</p>
+              <div className="grid grid-cols-2 gap-2 text-slate-600">
+                <div>
+                  <p className="font-semibold text-slate-700">Billed To:</p>
+                  <p>{selectedSale.customer?.name || 'Walk-in Customer'}</p>
+                  <p>{selectedSale.customer?.phone || ''}</p>
+                </div>
+                <div className="text-right">
+                  <p className="font-semibold text-slate-700">Date:</p>
+                  <p>{new Date(selectedSale.createdAt).toLocaleString()}</p>
+                  <p>Cashier: {selectedSale.cashier?.name}</p>
+                </div>
               </div>
-              <div className="text-right">
-                <p className="font-semibold text-slate-700">Date:</p>
-                <p>{new Date(selectedSale.createdAt).toLocaleString()}</p>
-                <p>Cashier: {selectedSale.cashier?.name}</p>
-              </div>
-            </div>
 
-            <div className="border rounded overflow-hidden">
-              <table className="w-full text-left">
-                <thead className="bg-slate-50 text-slate-500 border-b">
-                  <tr>
-                    <th className="p-2">Item</th>
-                    <th className="p-2 text-center">Batch</th>
-                    <th className="p-2 text-center">Qty</th>
-                    <th className="p-2 text-right">Price</th>
-                    <th className="p-2 text-right">Total</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {selectedSale.items.map((item) => (
-                    <tr key={item.id}>
-                      <td className="p-2 font-medium">{item.batch?.medicine?.name}</td>
-                      <td className="p-2 text-center font-mono text-[10px]">
-                        {item.batch?.batchNumber}
-                      </td>
-                      <td className="p-2 text-center">{item.quantity}</td>
-                      <td className="p-2 text-right">₹{item.unitPrice.toFixed(2)}</td>
-                      <td className="p-2 text-right font-bold">₹{item.totalPrice.toFixed(2)}</td>
+              <div className="border rounded overflow-hidden">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50 text-slate-500 border-b">
+                    <tr>
+                      <th className="p-2">Item</th>
+                      <th className="p-2 text-center">Batch</th>
+                      <th className="p-2 text-center">Qty</th>
+                      <th className="p-2 text-right">Price</th>
+                      <th className="p-2 text-right">Total</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="space-y-1 text-right">
-              <div>Subtotal: ₹{selectedSale.subTotal.toFixed(2)}</div>
-              <div>Tax (GST): ₹{selectedSale.taxAmount.toFixed(2)}</div>
-              <div>Discount: -₹{selectedSale.discountAmount.toFixed(2)}</div>
-              <div className="text-sm font-bold text-slate-900 border-t pt-1">
-                Grand Total: ₹{selectedSale.totalAmount.toFixed(2)}
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {selectedSale.items.map((item) => (
+                      <tr key={item.id}>
+                        <td className="p-2 font-medium">{item.batch?.medicine?.name}</td>
+                        <td className="p-2 text-center font-mono text-[10px]">
+                          {item.batch?.batchNumber}
+                        </td>
+                        <td className="p-2 text-center">{item.quantity}</td>
+                        <td className="p-2 text-right">₹{item.unitPrice.toFixed(2)}</td>
+                        <td className="p-2 text-right font-bold">₹{item.totalPrice.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </div>
 
-            <div className="flex justify-end space-x-2 pt-2 border-t">
-              <button
-                onClick={() => window.print()}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-semibold flex items-center space-x-1"
-              >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Print</span>
-              </button>
-              <button
-                onClick={() => setSelectedSale(null)}
-                className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm"
-              >
-                Close Receipt
-              </button>
+              <div className="space-y-1 text-right">
+                <div>Subtotal: ₹{selectedSale.subTotal.toFixed(2)}</div>
+                <div>Tax (GST): ₹{selectedSale.taxAmount.toFixed(2)}</div>
+                <div>Discount: -₹{selectedSale.discountAmount.toFixed(2)}</div>
+                <div className="text-sm font-bold text-slate-900 border-t pt-1">
+                  Grand Total: ₹{selectedSale.totalAmount.toFixed(2)}
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-2 border-t">
+                <button
+                  onClick={() => window.print()}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded font-semibold flex items-center space-x-1"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print</span>
+                </button>
+                <button
+                  onClick={() => setSelectedSale(null)}
+                  className="px-5 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-xs font-bold shadow-sm"
+                >
+                  Close Receipt
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
     </div>
   );

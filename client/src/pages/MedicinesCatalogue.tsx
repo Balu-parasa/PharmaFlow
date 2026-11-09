@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import { Medicine } from '../types';
+import { ModalPortal } from '../components/ModalPortal';
 
 export const MedicinesCatalogue: React.FC = () => {
   const [medicines, setMedicines] = useState<Medicine[]>([]);
@@ -237,137 +238,139 @@ export const MedicinesCatalogue: React.FC = () => {
 
       {/* Modal: Add/Edit Medicine */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] backdrop-blur-md flex items-center justify-center p-4 transition-all">
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
-          >
-            <div className="flex items-center justify-between border-b pb-3">
-              <h3 className="text-base font-extrabold text-textPrimary">
-                {editingMed ? 'Edit Medicine Details' : 'Add New Medicine to Catalogue'}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="text-slate-400 hover:text-slate-600 font-bold"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="col-span-2">
-                <label className="block text-textPrimary font-semibold mb-1">Brand Name *</label>
-                <input
-                  type="text"
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="e.g. Paracetamol 650"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="block text-textPrimary font-semibold mb-1">Generic Name</label>
-                <input
-                  type="text"
-                  value={form.genericName}
-                  onChange={(e) => setForm({ ...form, genericName: e.target.value })}
-                  placeholder="e.g. Acetaminophen"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="block text-textPrimary font-semibold mb-1">SKU *</label>
-                <input
-                  type="text"
-                  required
-                  value={form.sku}
-                  onChange={(e) => setForm({ ...form, sku: e.target.value })}
-                  placeholder="e.g. MED-PCM-650"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="block text-textPrimary font-semibold mb-1">Category</label>
-                <select
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
+        <ModalPortal>
+          <div className="fixed inset-0 z-[9999] backdrop-blur-md flex items-center justify-center p-4 transition-all">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-200"
+            >
+              <div className="flex items-center justify-between border-b pb-3">
+                <h3 className="text-base font-extrabold text-textPrimary">
+                  {editingMed ? 'Edit Medicine Details' : 'Add New Medicine to Catalogue'}
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="text-slate-400 hover:text-slate-600 font-bold"
                 >
-                  <option>Antibiotics</option>
-                  <option>Analgesics & Antipyretics</option>
-                  <option>Antihistamines</option>
-                  <option>Gastrointestinal</option>
-                  <option>Cardiovascular</option>
-                  <option>Respiratory</option>
-                </select>
+                  ✕
+                </button>
               </div>
-              <div>
-                <label className="block text-textPrimary font-semibold mb-1">Dosage Form</label>
-                <select
-                  value={form.dosageForm}
-                  onChange={(e) => setForm({ ...form, dosageForm: e.target.value })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
-                >
-                  <option>Tablet</option>
-                  <option>Syrup</option>
-                  <option>Capsule</option>
-                  <option>Injection</option>
-                  <option>Ointment</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-textPrimary font-semibold mb-1">Strength</label>
-                <input
-                  type="text"
-                  value={form.strength}
-                  onChange={(e) => setForm({ ...form, strength: e.target.value })}
-                  placeholder="e.g. 650mg or 100ml"
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl"
-                />
-              </div>
-              <div>
-                <label className="block text-textPrimary font-semibold mb-1">Min. Threshold</label>
-                <input
-                  type="number"
-                  min="0"
-                  value={form.minStockThreshold}
-                  onChange={(e) => setForm({ ...form, minStockThreshold: Number(e.target.value) })}
-                  className="w-full px-3 py-2 border border-slate-200 rounded-xl"
-                />
-              </div>
-              <div className="col-span-2 flex items-center space-x-2 pt-1">
-                <input
-                  type="checkbox"
-                  id="rxReq"
-                  checked={form.requiresPrescription}
-                  onChange={(e) => setForm({ ...form, requiresPrescription: e.target.checked })}
-                  className="rounded border-slate-300 text-secondary focus:ring-secondary"
-                />
-                <label htmlFor="rxReq" className="text-textPrimary font-semibold cursor-pointer">
-                  Requires valid doctor prescription to dispense
-                </label>
-              </div>
-            </div>
 
-            <div className="flex justify-end space-x-2 pt-4 border-t">
-              <button
-                type="button"
-                onClick={() => setShowModal(false)}
-                className="px-4 py-2 bg-slatebg hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-xl text-xs font-bold"
-              >
-                Save Changes
-              </button>
-            </div>
-          </form>
-        </div>
+              <div className="grid grid-cols-2 gap-3 text-xs">
+                <div className="col-span-2">
+                  <label className="block text-textPrimary font-semibold mb-1">Brand Name *</label>
+                  <input
+                    type="text"
+                    required
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="e.g. Paracetamol 650"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block text-textPrimary font-semibold mb-1">Generic Name</label>
+                  <input
+                    type="text"
+                    value={form.genericName}
+                    onChange={(e) => setForm({ ...form, genericName: e.target.value })}
+                    placeholder="e.g. Acetaminophen"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block text-textPrimary font-semibold mb-1">SKU *</label>
+                  <input
+                    type="text"
+                    required
+                    value={form.sku}
+                    onChange={(e) => setForm({ ...form, sku: e.target.value })}
+                    placeholder="e.g. MED-PCM-650"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block text-textPrimary font-semibold mb-1">Category</label>
+                  <select
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
+                  >
+                    <option>Antibiotics</option>
+                    <option>Analgesics & Antipyretics</option>
+                    <option>Antihistamines</option>
+                    <option>Gastrointestinal</option>
+                    <option>Cardiovascular</option>
+                    <option>Respiratory</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-textPrimary font-semibold mb-1">Dosage Form</label>
+                  <select
+                    value={form.dosageForm}
+                    onChange={(e) => setForm({ ...form, dosageForm: e.target.value })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
+                  >
+                    <option>Tablet</option>
+                    <option>Syrup</option>
+                    <option>Capsule</option>
+                    <option>Injection</option>
+                    <option>Ointment</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-textPrimary font-semibold mb-1">Strength</label>
+                  <input
+                    type="text"
+                    value={form.strength}
+                    onChange={(e) => setForm({ ...form, strength: e.target.value })}
+                    placeholder="e.g. 650mg or 100ml"
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block text-textPrimary font-semibold mb-1">Min. Threshold</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={form.minStockThreshold}
+                    onChange={(e) => setForm({ ...form, minStockThreshold: Number(e.target.value) })}
+                    className="w-full px-3 py-2 border border-slate-200 rounded-xl"
+                  />
+                </div>
+                <div className="col-span-2 flex items-center space-x-2 pt-1">
+                  <input
+                    type="checkbox"
+                    id="rxReq"
+                    checked={form.requiresPrescription}
+                    onChange={(e) => setForm({ ...form, requiresPrescription: e.target.checked })}
+                    className="rounded border-slate-300 text-secondary focus:ring-secondary"
+                  />
+                  <label htmlFor="rxReq" className="text-textPrimary font-semibold cursor-pointer">
+                    Requires valid doctor prescription to dispense
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="px-4 py-2 bg-slatebg hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-primary hover:bg-primary-light text-white rounded-xl text-xs font-bold"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </ModalPortal>
       )}
     </div>
   );
