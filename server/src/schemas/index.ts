@@ -55,7 +55,8 @@ export const createSaleSchema = z.object({
   paymentMethod: z.enum(['CASH', 'CARD', 'UPI']).default('CASH'),
   discountAmount: z.number().nonnegative().default(0),
   taxAmount: z.number().nonnegative().default(0),
-  notes: z.string().optional()
+  notes: z.string().optional(),
+  idempotencyKey: z.string().optional()
 });
 
 export const prescriptionSchema = z.object({

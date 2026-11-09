@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import crypto from 'crypto';
 import prisma from '../config/db.js';
 import { AuthRequest } from '../middlewares/auth.middleware.js';
 import { allocateFEFOBatches } from '../services/fefo.service.js';
@@ -15,7 +16,8 @@ export const createSale = async (req: AuthRequest, res: Response) => {
       paymentMethod,
       discountAmount = 0,
       taxAmount = 0,
-      notes
+      notes,
+      idempotencyKey: bodyIdempotencyKey
     } = req.body;
 
     const cashierId = req.user?.id;
@@ -25,6 +27,43 @@ export const createSale = async (req: AuthRequest, res: Response) => {
 
     if (!items || items.length === 0) {
       return res.status(400).json({ success: false, message: 'Sale must include at least one item.' });
+    }
+
+    // 1. Idempotency Key Handling
+    const idempotencyKey = (req.headers['idempotency-key'] as string) || bodyIdempotencyKey || null;
+    const payloadHash = idempotencyKey 
+      ? crypto.createHash('sha256').update(JSON.stringify({ customerId, customerPhone, items, autoFEFO, paymentMethod, discountAmount, taxAmount })).digest('hex')
+      : null;
+
+    if (idempotencyKey) {
+      const existingSale = await prisma.sale.findUnique({
+        where: { idempotencyKey },
+        include: {
+          customer: true,
+          cashier: { select: { id: true, name: true, email: true } },
+          prescription: true,
+          items: {
+            include: {
+              batch: { include: { medicine: true } }
+            }
+          }
+        }
+      });
+
+      if (existingSale) {
+        if (existingSale.payloadHash && existingSale.payloadHash !== payloadHash) {
+          return res.status(422).json({
+            success: false,
+            message: 'Idempotency conflict: key already used with different payload parameters.'
+          });
+        }
+        return res.status(200).json({
+          success: true,
+          message: 'Sale already processed (idempotent replay).',
+          isIdempotentReplay: true,
+          data: existingSale
+        });
+      }
     }
 
     // Generate unique invoice number: INV-YYYYMMDD-XXXX
@@ -211,6 +250,8 @@ export const createSale = async (req: AuthRequest, res: Response) => {
       const sale = await tx.sale.create({
         data: {
           invoiceNumber,
+          idempotencyKey,
+          payloadHash,
           customerId: finalCustomerId || null,
           cashierId,
           prescriptionId: prescriptionId || null,

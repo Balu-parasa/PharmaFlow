@@ -139,6 +139,8 @@ model PurchaseOrder {
 model Sale {
   id             String         @id @default(uuid())
   invoiceNumber  String         @unique
+  idempotencyKey String?        @unique
+  payloadHash    String?
   customerId     String?
   customer       Customer?      @relation(fields: [customerId], references: [id])
   cashierId      String
@@ -157,6 +159,7 @@ model Sale {
   updatedAt      DateTime       @updatedAt
 
   @@index([invoiceNumber])
+  @@index([idempotencyKey])
   @@index([cashierId])
   @@index([createdAt])
 }
