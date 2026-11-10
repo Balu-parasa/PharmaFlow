@@ -18,3 +18,4 @@ export const ModalPortal: React.FC<ModalPortalProps> = ({ children }) => {
   const modalRoot = document.getElementById('modal-root') || document.body;
   return createPortal(children, modalRoot);
 };
+

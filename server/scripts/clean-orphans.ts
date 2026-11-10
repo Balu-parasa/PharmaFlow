@@ -14,3 +14,4 @@ clean().catch((e) => {
   console.error(e);
   prisma.$disconnect();
 });
+
