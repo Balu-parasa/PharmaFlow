@@ -134,6 +134,8 @@ export const POS: React.FC = () => {
   const taxAmount = (subtotal * taxPercent) / 100;
   const grandTotal = Math.max(0, subtotal + taxAmount - discountAmount);
 
+  const [currentIdempotencyKey, setCurrentIdempotencyKey] = useState<string>(() => 'pos_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9));
+
   const handleCheckout = async () => {
     if (cart.length === 0) {
       setErrorMessage('Cart is empty.');
@@ -145,6 +147,7 @@ export const POS: React.FC = () => {
 
     try {
       const payload = {
+        idempotencyKey: currentIdempotencyKey,
         customerName: customerName.trim() || undefined,
         customerPhone: customerPhone.trim() || undefined,
         items: cart.map((item) => ({
@@ -165,6 +168,7 @@ export const POS: React.FC = () => {
         setCustomerName('');
         setCustomerPhone('');
         setDiscountAmount(0);
+        setCurrentIdempotencyKey('pos_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9));
         fetchMedicines();
       }
     } catch (err: any) {
