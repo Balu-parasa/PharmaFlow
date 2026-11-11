@@ -18,7 +18,7 @@ interface LoginProps {
 
 export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState('admin@pharmaflow.com');
-  const [password, setPassword] = useState('AdminPassword123!');
+  const [password, setPassword] = useState('admin123');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -180,7 +180,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
-                  onClick={() => handleFillDemo('admin@pharmaflow.com', 'AdminPassword123!')}
+                  onClick={() => handleFillDemo('admin@pharmaflow.com', 'admin123')}
                   className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
                     email === 'admin@pharmaflow.com'
                       ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
@@ -191,7 +191,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleFillDemo('pharmacist@pharmaflow.com', 'PharmPassword123!')}
+                  onClick={() => handleFillDemo('pharmacist@pharmaflow.com', 'password123')}
                   className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
                     email === 'pharmacist@pharmaflow.com'
                       ? 'bg-[#0098FF] text-white border-[#0098FF] shadow-sm'
@@ -202,7 +202,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleFillDemo('cashier@pharmaflow.com', 'CashierPassword123!')}
+                  onClick={() => handleFillDemo('cashier@pharmaflow.com', 'password123')}
                   className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
                     email === 'cashier@pharmaflow.com'
                       ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
