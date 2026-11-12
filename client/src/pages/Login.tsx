@@ -5,9 +5,8 @@ import {
   AlertCircle, 
   Eye, 
   EyeOff, 
-  ShieldCheck, 
-  CheckCircle2,
-  Sparkles
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 import api from '../services/api';
 import { User } from '../types';
@@ -50,57 +49,53 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 lg:p-8 relative bg-cover bg-center overflow-x-hidden"
-         style={{ backgroundImage: `url('/doctor-pharmacy-hero.png')` }}>
-      
+    <div 
+      className="h-screen w-screen flex items-center justify-center p-3 sm:p-5 relative bg-cover bg-center overflow-hidden"
+      style={{ backgroundImage: `url('/doctor-pharmacy-hero.png')` }}
+    >
       {/* Background Soft Backdrop Blur Overlay for realism */}
-      <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-md" />
+      <div className="absolute inset-0 bg-slate-900/35 backdrop-blur-md" />
 
-      {/* Main Center White Card matching reference image exactly */}
-      <div className="relative z-10 w-full max-w-[1020px] bg-white rounded-[32px] sm:rounded-[40px] shadow-[0_24px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden flex flex-col md:flex-row border border-white/60">
+      {/* Main Center White Card matching reference image with perfect viewport scaling */}
+      <div className="relative z-10 w-full max-w-[880px] max-h-[92vh] bg-white rounded-[28px] sm:rounded-[36px] shadow-[0_20px_50px_-10px_rgba(0,0,0,0.35)] overflow-hidden flex flex-col md:flex-row border border-white/70">
         
         {/* ========================================================= */}
         {/* LEFT COLUMN: Clean Clinical Sign-In Form (50%) */}
         {/* ========================================================= */}
-        <div className="w-full md:w-1/2 p-7 sm:p-10 lg:p-12 xl:p-14 flex flex-col justify-between bg-white relative z-10">
+        <div className="w-full md:w-1/2 p-6 sm:p-8 lg:p-9 flex flex-col justify-between bg-white relative z-10 overflow-y-auto">
           
-          {/* Top Brand Logo */}
+          {/* Top Brand Logo without PRO badge */}
           <div className="flex items-center space-x-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#0284C7] to-[#0EA5E9] flex items-center justify-center text-white shadow-sm flex-shrink-0">
-              <span className="text-xl font-black leading-none">+</span>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0284C7] to-[#0EA5E9] flex items-center justify-center text-white shadow-sm flex-shrink-0">
+              <span className="text-lg font-black leading-none">+</span>
             </div>
-            <div className="flex items-center space-x-1.5">
-              <span className="text-xl font-bold tracking-tight text-[#0EA5E9]">PharmaFlow</span>
-              <span className="text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-600 px-2 py-0.5 rounded-full border border-emerald-200">
-                PRO
-              </span>
-            </div>
+            <span className="text-xl font-bold tracking-tight text-[#0EA5E9]">PharmaFlow</span>
           </div>
 
           {/* Form Middle Body */}
-          <div className="my-auto py-6 max-w-sm w-full mx-auto">
+          <div className="my-auto py-3 max-w-[340px] w-full mx-auto">
             
-            <div className="text-center mb-6">
-              <h1 className="text-2xl sm:text-[28px] font-bold text-slate-900 tracking-tight">
+            <div className="text-center mb-4">
+              <h1 className="text-2xl sm:text-[26px] font-bold text-slate-900 tracking-tight leading-tight">
                 Welcome back
               </h1>
-              <p className="text-xs text-slate-400 mt-1.5 font-medium">
-                Smart pharmacy management & FEFO stock dispensation
+              <p className="text-[11px] text-slate-400 mt-1 font-medium">
+                Order from different drugstores all around the country
               </p>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center space-x-2 animate-in fade-in">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <div className="mb-3 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-rose-700 text-xs flex items-center space-x-2 animate-in fade-in">
+                <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
                 <span className="font-medium">{error}</span>
               </div>
             )}
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Email address
                 </label>
                 <input
@@ -109,12 +104,12 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                   placeholder="Enter your Email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 transition-all font-medium"
+                  className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 transition-all font-medium"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Password
                 </label>
                 <div className="relative">
@@ -124,12 +119,12 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                     placeholder="••••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 pr-11 py-3 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 transition-all font-medium"
+                    className="w-full px-3.5 pr-10 py-2.5 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#0EA5E9] focus:ring-2 focus:ring-[#0EA5E9]/20 transition-all font-medium"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 transition-colors"
+                    className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -144,11 +139,11 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3 bg-[#0098FF] hover:bg-[#0086E6] text-white font-bold rounded-xl text-sm shadow-[0_6px_18px_rgba(0,152,255,0.35)] transition-all flex items-center justify-center space-x-2 mt-2 cursor-pointer active:scale-[0.99]"
+                className="w-full py-2.5 bg-[#0098FF] hover:bg-[#0086E6] text-white font-bold rounded-xl text-xs sm:text-sm shadow-[0_6px_16px_rgba(0,152,255,0.3)] transition-all flex items-center justify-center space-x-2 mt-2 cursor-pointer active:scale-[0.99]"
               >
                 {loading ? (
                   <div className="flex items-center space-x-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     <span>Signing in...</span>
                   </div>
                 ) : (
@@ -157,7 +152,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
               </button>
             </form>
 
-            <p className="text-[11px] text-slate-500 text-center mt-3 font-medium">
+            <p className="text-[11px] text-slate-500 text-center mt-2.5 font-medium">
               Don't you have any account?{' '}
               <span className="text-[#0EA5E9] font-bold hover:underline cursor-pointer">
                 Sign up
@@ -165,25 +160,25 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             </p>
 
             {/* Divider OR */}
-            <div className="relative my-4 flex items-center justify-center">
+            <div className="relative my-3 flex items-center justify-center">
               <div className="border-t border-slate-200 w-full absolute" />
-              <span className="bg-white px-3 text-[10px] font-bold text-slate-400 uppercase tracking-widest relative z-10">
+              <span className="bg-white px-2.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest relative z-10">
                 OR
               </span>
             </div>
 
             {/* Instant Demo Role Switcher Buttons */}
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 text-center mb-2">
+              <div className="text-[9px] font-bold uppercase tracking-wider text-slate-400 text-center mb-1.5">
                 Instant Demo Access
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1.5">
                 <button
                   type="button"
                   onClick={() => handleFillDemo('admin@pharmaflow.com', 'admin123')}
-                  className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
+                  className={`py-1.5 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center cursor-pointer ${
                     email === 'admin@pharmaflow.com'
-                      ? 'bg-slate-900 text-white border-slate-900 shadow-sm'
+                      ? 'bg-slate-900 text-white border-slate-900 shadow-xs'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white'
                   }`}
                 >
@@ -192,9 +187,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 <button
                   type="button"
                   onClick={() => handleFillDemo('pharmacist@pharmaflow.com', 'password123')}
-                  className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
+                  className={`py-1.5 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center cursor-pointer ${
                     email === 'pharmacist@pharmaflow.com'
-                      ? 'bg-[#0098FF] text-white border-[#0098FF] shadow-sm'
+                      ? 'bg-[#0098FF] text-white border-[#0098FF] shadow-xs'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white'
                   }`}
                 >
@@ -203,9 +198,9 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 <button
                   type="button"
                   onClick={() => handleFillDemo('cashier@pharmaflow.com', 'password123')}
-                  className={`py-2 px-2 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
+                  className={`py-1.5 px-1.5 rounded-lg text-[11px] font-bold border transition-all text-center cursor-pointer ${
                     email === 'cashier@pharmaflow.com'
-                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
                       : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white'
                   }`}
                 >
@@ -224,35 +219,14 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         </div>
 
         {/* ========================================================= */}
-        {/* RIGHT COLUMN: Realistic Clinical Doctor & Medication Photo (50%) */}
+        {/* RIGHT COLUMN: Clean Doctor & Medicine Photo without Overlays */}
         {/* ========================================================= */}
-        <div className="hidden md:block w-1/2 relative bg-slate-50 overflow-hidden">
+        <div className="hidden md:block w-1/2 relative bg-slate-50 overflow-hidden select-none">
           <img 
             src="/doctor-hero-isolated.png" 
             alt="Clinical Pharmacist Dispensing Medicine" 
             className="w-full h-full object-cover object-center"
           />
-
-          {/* Floating Realistic Telemetry Pill Badges */}
-          <div className="absolute top-6 right-6 bg-white/90 backdrop-blur-md p-3 rounded-2xl shadow-lg border border-white/80 max-w-[210px] space-y-1">
-            <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[11px] font-bold text-slate-800">FEFO Engine Active</span>
-            </div>
-            <p className="text-[10px] text-slate-500 leading-tight">
-              Earliest-expiring batch automatically allocated for patient safety.
-            </p>
-          </div>
-
-          <div className="absolute bottom-6 left-6 bg-slate-900/80 backdrop-blur-md px-4 py-2.5 rounded-2xl shadow-xl border border-white/10 flex items-center space-x-3 text-white">
-            <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center text-[#0EA5E9]">
-              <Sparkles className="w-4 h-4" />
-            </div>
-            <div>
-              <p className="text-xs font-bold">PharmaFlow Clinical Suite</p>
-              <p className="text-[10px] text-slate-300">Zero Medication Dispense Errors</p>
-            </div>
-          </div>
         </div>
 
       </div>
