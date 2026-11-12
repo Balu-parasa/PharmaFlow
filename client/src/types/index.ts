@@ -165,6 +165,7 @@ export interface DashboardSummary {
   todaySalesCount: number;
   totalRevenue: number;
   totalSalesCount: number;
+  grossMarginPercent?: number;
   totalStockUnits: number;
   totalValuation: number;
   lowStockCount: number;
@@ -180,5 +181,16 @@ export interface DashboardSummary {
     dosageForm: string;
     totalQuantitySold: number;
     totalRevenue: number;
+  }>;
+  last7DaysTrend?: Array<{
+    label: string;
+    dateKey: string;
+    revenue: number;
+    expense: number;
+  }>;
+  monthlyTrend?: Array<{
+    label: string;
+    revenue: number;
+    expense: number;
   }>;
 }

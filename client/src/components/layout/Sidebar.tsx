@@ -60,21 +60,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab, use
       {/* Brand Header */}
       <div className="p-4 sm:p-5 border-b border-slate-800/70 flex items-center justify-between bg-[#08111B]/60">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 rounded-2xl bg-white/10 p-2 flex items-center justify-center shadow-md overflow-hidden flex-shrink-0 border border-white/15 backdrop-blur-sm">
+          <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
             <img 
               src="/pharmaflow-logo.png" 
-              alt="PharmaFlow Logo" 
-              className="w-full h-full object-contain drop-shadow-[0_2px_8px_rgba(59,104,233,0.5)] transform scale-110"
+              alt="Capsulix Logo" 
+              className="w-full h-full object-contain drop-shadow-[0_2px_10px_rgba(14,165,233,0.35)] transition-transform hover:scale-105"
             />
           </div>
           <div>
-            <div className="flex items-center space-x-1.5">
-              <h1 className="font-bold text-base tracking-tight text-white">PharmaFlow</h1>
-              <span className="text-[9px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full border border-emerald-500/30">
-                PRO
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400 font-normal">Pharmacy Intelligence</p>
+            <h1 className="font-extrabold text-base tracking-tight text-white leading-tight">Capsulix</h1>
+            <p className="text-[10px] text-slate-400 font-medium tracking-tight">Precision Pharmacy, Zero Errors.</p>
           </div>
         </div>
       </div>

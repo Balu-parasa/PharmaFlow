@@ -87,7 +87,7 @@ export function App() {
 
       <div className="flex-1 flex flex-col min-w-0">
         <Header
-          title={tabTitles[currentTab] || 'PharmaFlow'}
+          title={tabTitles[currentTab] || 'Capsulix'}
           user={user}
           nearExpiryCount={nearExpiryCount}
           lowStockCount={lowStockCount}

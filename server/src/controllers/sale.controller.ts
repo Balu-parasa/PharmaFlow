@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import prisma from '../config/db.js';
 import { AuthRequest } from '../middlewares/auth.middleware.js';
 import { allocateFEFOBatches } from '../services/fefo.service.js';
+import { isBatchExpired } from '../utils/expiry.js';
 
 export const createSale = async (req: AuthRequest, res: Response) => {
   try {
@@ -111,11 +112,26 @@ export const createSale = async (req: AuthRequest, res: Response) => {
             const lineDiscount = it.discount ? (it.discount / it.quantity) * alloc.quantity : 0;
             const lineTotal = alloc.quantity * linePrice - lineDiscount;
 
-            // Deduct stock
-            const updatedBatch = await tx.batch.update({
-              where: { id: alloc.batchId },
-              data: { quantityInStock: { decrement: alloc.quantity } }
+            // Database-level conditional atomic decrement:
+            // Only decrements if quantityInStock >= requested. If another concurrent process deducted it, count is 0.
+            const decrementResult = await tx.batch.updateMany({
+              where: {
+                id: alloc.batchId,
+                quantityInStock: { gte: alloc.quantity }
+              },
+              data: {
+                quantityInStock: { decrement: alloc.quantity }
+              }
             });
+
+            if (decrementResult.count === 0) {
+              const currentBatch = await tx.batch.findUnique({ where: { id: alloc.batchId } });
+              throw new Error(
+                `Concurrent conflict: Insufficient stock for batch ${alloc.batchNumber}. Available: ${currentBatch?.quantityInStock || 0}, Requested: ${alloc.quantity}`
+              );
+            }
+
+            const updatedBatch = await tx.batch.findUniqueOrThrow({ where: { id: alloc.batchId } });
 
             // Record immutable stock movement
             await tx.stockMovement.create({
@@ -160,8 +176,8 @@ export const createSale = async (req: AuthRequest, res: Response) => {
             throw new Error(`Batch ${batch.batchNumber} (${batch.medicine.name}) has been recalled.`);
           }
 
-          // Strict block on expired batches
-          if (new Date(batch.expiryDate) <= now) {
+          // Strict block on expired batches using date-only policy
+          if (isBatchExpired(batch.expiryDate, now)) {
             throw new Error(
               `Batch ${batch.batchNumber} (${batch.medicine.name}) expired on ${new Date(
                 batch.expiryDate
@@ -208,13 +224,26 @@ export const createSale = async (req: AuthRequest, res: Response) => {
             });
           }
 
-          // Atomic decrement
-          const updatedBatch = await tx.batch.update({
-            where: { id: batch.id },
+          // Database-level conditional atomic decrement:
+          // WHERE id = batch.id AND quantityInStock >= requested
+          const decrementResult = await tx.batch.updateMany({
+            where: {
+              id: batch.id,
+              quantityInStock: { gte: item.quantity }
+            },
             data: {
               quantityInStock: { decrement: item.quantity }
             }
           });
+
+          if (decrementResult.count === 0) {
+            const currentBatch = await tx.batch.findUnique({ where: { id: batch.id } });
+            throw new Error(
+              `Concurrent conflict: Insufficient stock for ${batch.medicine.name} (Batch: ${batch.batchNumber}). Available: ${currentBatch?.quantityInStock || 0}, Requested: ${item.quantity}`
+            );
+          }
+
+          const updatedBatch = await tx.batch.findUniqueOrThrow({ where: { id: batch.id } });
 
           // Stock movement audit
           await tx.stockMovement.create({
@@ -344,14 +373,32 @@ export const returnSale = async (req: AuthRequest, res: Response) => {
         throw new Error('Sale not found');
       }
 
+      let allItemsFullyReturned = true;
+
       for (const retItem of items) {
         const saleItem = sale.items.find((si) => si.id === retItem.saleItemId);
         if (!saleItem) {
           throw new Error(`Sale item ${retItem.saleItemId} does not belong to this sale.`);
         }
-        if (retItem.quantity > saleItem.quantity) {
-          throw new Error(`Cannot return ${retItem.quantity} units. Original sold quantity was ${saleItem.quantity}.`);
+        
+        const alreadyReturned = saleItem.returnedQuantity || 0;
+        const remainingReturnable = saleItem.quantity - alreadyReturned;
+
+        if (retItem.quantity <= 0) {
+          throw new Error('Return quantity must be a positive number.');
         }
+
+        if (retItem.quantity > remainingReturnable) {
+          throw new Error(
+            `Cannot return ${retItem.quantity} units for item ${saleItem.id}. Already returned: ${alreadyReturned}, Remaining eligible: ${remainingReturnable}.`
+          );
+        }
+
+        // Update returned quantity on the sale item
+        await tx.saleItem.update({
+          where: { id: saleItem.id },
+          data: { returnedQuantity: { increment: retItem.quantity } }
+        });
 
         // Restock batch
         const updatedBatch = await tx.batch.update({
@@ -373,9 +420,16 @@ export const returnSale = async (req: AuthRequest, res: Response) => {
         });
       }
 
+      // Check if entire sale is now fully returned or partially returned
+      const updatedSaleItems = await tx.saleItem.findMany({ where: { saleId: id } });
+      const totalSold = updatedSaleItems.reduce((acc, it) => acc + it.quantity, 0);
+      const totalReturned = updatedSaleItems.reduce((acc, it) => acc + (it.returnedQuantity || 0), 0);
+
+      const newStatus = totalReturned >= totalSold ? 'REFUNDED' : 'PARTIAL_RETURN';
+
       await tx.sale.update({
         where: { id },
-        data: { paymentStatus: 'REFUNDED' }
+        data: { paymentStatus: newStatus }
       });
 
       await tx.auditLog.create({
@@ -384,11 +438,11 @@ export const returnSale = async (req: AuthRequest, res: Response) => {
           action: 'RETURN_PROCESSED',
           entity: 'Sale',
           entityId: sale.id,
-          details: JSON.stringify({ reason, returnedItems: items })
+          details: JSON.stringify({ reason, returnedItems: items, paymentStatus: newStatus })
         }
       });
 
-      return { saleId: id, status: 'REFUNDED' };
+      return { saleId: id, status: newStatus, totalReturned, totalSold };
     });
 
     res.json({ success: true, message: 'Return processed and inventory restocked', data: returnResult });

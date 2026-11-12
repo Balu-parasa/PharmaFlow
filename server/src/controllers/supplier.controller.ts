@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../config/db.js';
 import { AuthRequest } from '../middlewares/auth.middleware.js';
+import { isBatchExpired } from '../utils/expiry.js';
 
 export const getSuppliers = async (req: Request, res: Response) => {
   try {
@@ -95,7 +96,7 @@ export const createPurchaseOrder = async (req: AuthRequest, res: Response) => {
           throw new Error('All batch fields (medicine, batchNumber, expiryDate, costPrice, sellingPrice, quantity) are required.');
         }
 
-        if (new Date(it.expiryDate) <= now) {
+        if (isBatchExpired(it.expiryDate, now)) {
           throw new Error(`Cannot receive batch ${it.batchNumber} that has already expired (${it.expiryDate}).`);
         }
 

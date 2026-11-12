@@ -53,7 +53,7 @@ export const Reports: React.FC = () => {
         <div>
           <div className="inline-flex items-center space-x-2 bg-blue-50 px-3 py-1 rounded-full text-xs font-bold text-primary mb-2 border border-blue-100">
             <BarChart3 className="w-3.5 h-3.5" />
-            <span>PharmaFlow Financial & Inventory Governance</span>
+            <span>Capsulix — Precision Pharmacy, Zero Errors.</span>
           </div>
           <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
             Financial Reports & Stock Reconciliation

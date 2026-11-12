@@ -32,7 +32,8 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    service: 'PharmaFlow API'
+    service: 'Capsulix API',
+    tagline: 'Precision Pharmacy, Zero Errors.'
   });
 });
 

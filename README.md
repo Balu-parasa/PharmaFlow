@@ -1,4 +1,4 @@
-# PharmaFlow — Smart Pharmacy Management System
+# Capsulix — Precision Pharmacy, Zero Errors.
 
 > **Enterprise Grade Pharmacy Intelligence, FEFO Batch Dispensation, Real-Time Reconciliation & 21 CFR Part 11 Audit Trail**  
 > Developed for **ALGIONS AI LABS PRIVATE LIMITED** Full-Stack Engineering Assessment.

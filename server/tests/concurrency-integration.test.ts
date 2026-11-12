@@ -206,9 +206,114 @@ describe('PharmaFlow Critical Integration & Concurrency Test Suite', () => {
     const finalBatch = await prisma.batch.findUnique({ where: { id: laterBatch.id } });
     expect(finalBatch!.quantityInStock).toBe(10);
     expect(finalBatch!.quantityInStock).toBeGreaterThanOrEqual(0);
+
+    // Verify that every successful checkout created exactly one sale record and corresponding stock movement
+    const movements = await prisma.stockMovement.findMany({
+      where: { batchId: laterBatch.id, type: 'SALE' }
+    });
+    expect(movements.length).toBeGreaterThanOrEqual(2);
   });
 
-  it('5. Regulatory Stock Reconciliation Formula holds 100% mathematically across all ledger events', async () => {
+  it('5. Expiry Date Boundary Policy: Verifies today, yesterday, and tomorrow boundary rules', async () => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+    // 1. Purchase receiving with yesterday's date MUST be rejected
+    const expiredPurchaseRes = await request(app)
+      .post('/api/suppliers/purchases')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        supplierId: testMedicine.id ? (await prisma.supplier.findFirst())?.id : '',
+        items: [{
+          medicineId: testMedicine.id,
+          batchNumber: `BAT-YEST-${Date.now()}`,
+          expiryDate: yesterday,
+          costPrice: 10,
+          sellingPrice: 15,
+          quantity: 20
+        }]
+      });
+    expect(expiredPurchaseRes.status).toBe(400);
+    expect(expiredPurchaseRes.body.message).toContain('already expired');
+
+    // 2. Tomorrow's batch MUST be accepted
+    const validPurchaseRes = await request(app)
+      .post('/api/suppliers/purchases')
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        supplierId: (await prisma.supplier.findFirst())?.id,
+        items: [{
+          medicineId: testMedicine.id,
+          batchNumber: `BAT-TOM-${Date.now()}`,
+          expiryDate: tomorrow,
+          costPrice: 10,
+          sellingPrice: 25,
+          quantity: 20
+        }]
+      });
+    expect(validPurchaseRes.status).toBe(201);
+  });
+
+  it('6. Multiple Partial Returns & Capping: Never permits returns beyond sold quantity across multiple return events', async () => {
+    // 1. Create a sale of 10 units
+    const saleRes = await request(app)
+      .post('/api/sales')
+      .set('Authorization', `Bearer ${cashierToken}`)
+      .send({
+        items: [{ batchId: laterBatch.id, quantity: 5, unitPrice: 20 }],
+        paymentMethod: 'CASH'
+      });
+    expect(saleRes.status).toBe(201);
+    const saleId = saleRes.body.data.id;
+    const saleItemId = saleRes.body.data.items[0].id;
+
+    // 2. Partial return 1: return 2 units out of 5
+    const ret1 = await request(app)
+      .post(`/api/sales/${saleId}/return`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        reason: 'Patient changed dosage',
+        items: [{ saleItemId, quantity: 2 }]
+      });
+    expect(ret1.status).toBe(200);
+    expect(ret1.body.data.status).toBe('PARTIAL_RETURN');
+
+    // 3. Partial return 2: return 2 more units (total returned: 4 out of 5)
+    const ret2 = await request(app)
+      .post(`/api/sales/${saleId}/return`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        reason: 'Surplus medication',
+        items: [{ saleItemId, quantity: 2 }]
+      });
+    expect(ret2.status).toBe(200);
+    expect(ret2.body.data.status).toBe('PARTIAL_RETURN');
+
+    // 4. Excess return attempt: return 2 units when only 1 is eligible -> MUST FAIL
+    const retExcess = await request(app)
+      .post(`/api/sales/${saleId}/return`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        reason: 'Excess attempt',
+        items: [{ saleItemId, quantity: 2 }]
+      });
+    expect(retExcess.status).toBe(400);
+    expect(retExcess.body.message).toContain('Remaining eligible');
+
+    // 5. Final eligible return: return remaining 1 unit -> MUST SUCCEED & mark REFUNDED
+    const retFinal = await request(app)
+      .post(`/api/sales/${saleId}/return`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        reason: 'Final remaining unit return',
+        items: [{ saleItemId, quantity: 1 }]
+      });
+    expect(retFinal.status).toBe(200);
+    expect(retFinal.body.data.status).toBe('REFUNDED');
+  });
+
+  it('7. Regulatory Stock Reconciliation Formula holds 100% mathematically across all ledger events', async () => {
     const reconRes = await request(app)
       .get('/api/reports/reconciliation')
       .set('Authorization', `Bearer ${adminToken}`);

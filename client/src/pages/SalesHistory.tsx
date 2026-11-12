@@ -108,7 +108,7 @@ export const SalesHistory: React.FC = () => {
             <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 text-xs space-y-4 border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
               <div className="flex items-center justify-between border-b pb-3">
                 <div>
-                  <h3 className="text-base font-bold text-slate-900">PharmaFlow Pharmacy</h3>
+                  <h3 className="text-base font-bold text-slate-900">Capsulix Pharmacy</h3>
                   <p className="text-slate-400">Invoice: {selectedSale.invoiceNumber}</p>
                 </div>
                 <button

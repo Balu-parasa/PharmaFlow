@@ -64,12 +64,19 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         {/* ========================================================= */}
         <div className="w-full md:w-1/2 p-6 sm:p-8 lg:p-9 flex flex-col justify-between bg-white relative z-10 overflow-y-auto">
           
-          {/* Top Brand Logo without PRO badge */}
+          {/* Top Brand Logo */}
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0284C7] to-[#0EA5E9] flex items-center justify-center text-white shadow-sm flex-shrink-0">
-              <span className="text-lg font-black leading-none">+</span>
+            <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+              <img 
+                src="/pharmaflow-logo.png" 
+                alt="Capsulix Logo" 
+                className="w-full h-full object-contain drop-shadow-[0_2px_10px_rgba(14,165,233,0.3)]"
+              />
             </div>
-            <span className="text-xl font-bold tracking-tight text-[#0EA5E9]">PharmaFlow</span>
+            <div>
+              <span className="text-xl font-black tracking-tight text-[#0EA5E9] block leading-none">Capsulix</span>
+              <p className="text-[10px] text-slate-400 font-medium tracking-tight mt-0.5">Precision Pharmacy, Zero Errors.</p>
+            </div>
           </div>
 
           {/* Form Middle Body */}

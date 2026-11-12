@@ -165,16 +165,17 @@ model Sale {
 }
 
 model SaleItem {
-  id         String   @id @default(uuid())
-  saleId     String
-  sale       Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  batchId    String
-  batch      Batch    @relation(fields: [batchId], references: [id])
-  quantity   Int
-  unitPrice  Float
-  discount   Float    @default(0)
-  totalPrice Float
-  createdAt  DateTime @default(now())
+  id               String   @id @default(uuid())
+  saleId           String
+  sale             Sale     @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  batchId          String
+  batch            Batch    @relation(fields: [batchId], references: [id])
+  quantity         Int
+  returnedQuantity Int      @default(0)
+  unitPrice        Float
+  discount         Float    @default(0)
+  totalPrice       Float
+  createdAt        DateTime @default(now())
 
   @@index([saleId])
   @@index([batchId])

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../config/db.js';
 import { AuthRequest } from '../middlewares/auth.middleware.js';
+import { getEndOfTodayIST, getFutureISTBoundary } from '../utils/expiry.js';
 
 export const getBatches = async (req: Request, res: Response) => {
   try {
@@ -11,14 +12,14 @@ export const getBatches = async (req: Request, res: Response) => {
       where.medicineId = String(medicineId);
     }
 
-    const now = new Date();
+    const endOfToday = getEndOfTodayIST();
 
     if (expired === 'true') {
-      where.expiryDate = { lte: now };
+      where.expiryDate = { lte: endOfToday };
     } else if (nearExpiry === 'true') {
-      const thirtyDaysAhead = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+      const thirtyDaysAhead = getFutureISTBoundary(30);
       where.expiryDate = {
-        gte: now,
+        gt: endOfToday,
         lte: thirtyDaysAhead
       };
       where.quantityInStock = { gt: 0 };
@@ -193,12 +194,12 @@ export const adjustStock = async (req: AuthRequest, res: Response) => {
 
 export const getExpiryAlerts = async (req: Request, res: Response) => {
   try {
-    const now = new Date();
-    const thirtyDaysAhead = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    const endOfToday = getEndOfTodayIST();
+    const thirtyDaysAhead = getFutureISTBoundary(30);
 
     const expired = await prisma.batch.findMany({
       where: {
-        expiryDate: { lte: now },
+        expiryDate: { lte: endOfToday },
         quantityInStock: { gt: 0 }
       },
       include: { medicine: true },
@@ -208,7 +209,7 @@ export const getExpiryAlerts = async (req: Request, res: Response) => {
     const expiringSoon = await prisma.batch.findMany({
       where: {
         expiryDate: {
-          gt: now,
+          gt: endOfToday,
           lte: thirtyDaysAhead
         },
         quantityInStock: { gt: 0 }

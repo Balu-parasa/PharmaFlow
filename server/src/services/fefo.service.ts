@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { isBatchExpired } from '../utils/expiry.js';
 
 export interface FEFOAllocation {
   batchId: string;
@@ -14,7 +15,7 @@ export interface FEFOAllocation {
  *
  * Rules:
  * 1. Exclude recalled batches.
- * 2. Exclude already expired batches (expiryDate <= now).
+ * 2. Exclude already expired batches (expiryDate date-only boundary check).
  * 3. Sort batches ascending by expiryDate (earliest expiry first).
  * 4. Fulfill requested quantity across available batches.
  * 5. If total available across valid batches is less than required, throw error.
@@ -26,18 +27,20 @@ export async function allocateFEFOBatches(
 ): Promise<FEFOAllocation[]> {
   const now = new Date();
 
-  // Find all active, non-recalled, non-expired batches with stock > 0, ordered by expiryDate ASC
-  const batches = await tx.batch.findMany({
+  // Find all active, non-recalled batches with stock > 0, ordered by expiryDate ASC
+  const candidateBatches = await tx.batch.findMany({
     where: {
       medicineId,
       isRecalled: false,
-      expiryDate: { gt: now },
       quantityInStock: { gt: 0 }
     },
     orderBy: {
       expiryDate: 'asc' // FEFO: Earliest expiry date first
     }
   });
+
+  // Filter batches using strict date-only business expiry rule
+  const batches = candidateBatches.filter((b: any) => !isBatchExpired(b.expiryDate, now));
 
   const totalAvailable = batches.reduce((sum: number, b: any) => sum + b.quantityInStock, 0);
   if (totalAvailable < quantityRequired) {
