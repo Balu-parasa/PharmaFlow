@@ -75,7 +75,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
             </div>
             <div>
               <span className="text-xl font-black tracking-tight text-[#0EA5E9] block leading-none">Capsulix</span>
-              <p className="text-[10px] text-slate-400 font-medium tracking-tight mt-0.5">Precision Pharmacy, Zero Errors.</p>
             </div>
           </div>
 
@@ -136,11 +135,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <div className="mt-1 text-left">
-                  <span className="text-[11px] font-semibold text-[#0EA5E9] hover:underline cursor-pointer">
-                    forgot password?
-                  </span>
-                </div>
               </div>
 
               <button
@@ -158,13 +152,6 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 )}
               </button>
             </form>
-
-            <p className="text-[11px] text-slate-500 text-center mt-2.5 font-medium">
-              Don't you have any account?{' '}
-              <span className="text-[#0EA5E9] font-bold hover:underline cursor-pointer">
-                Sign up
-              </span>
-            </p>
 
             {/* Divider OR */}
             <div className="relative my-3 flex items-center justify-center">
@@ -220,7 +207,7 @@ export const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
 
           {/* Left Footer */}
           <div className="pt-2 text-[10px] text-slate-400 text-center font-medium">
-            21 CFR Part 11 Compliant • TLS 256-Bit Encrypted
+            Secure Role-Based Access • Audit Logging • Protected Sessions
           </div>
 
         </div>

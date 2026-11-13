@@ -10,6 +10,20 @@ export interface AuthRequest extends Request {
   };
 }
 
+export const getJwtSecret = (): string => {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('FATAL: JWT_SECRET environment variable is missing in production environment.');
+    }
+    return 'super_pharma_secret_jwt_key_928374982374';
+  }
+  if (process.env.NODE_ENV === 'production' && secret.length < 32) {
+    throw new Error('FATAL: JWT_SECRET must be at least 32 characters in production.');
+  }
+  return secret;
+};
+
 export const authenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -18,7 +32,7 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
 
   const token = authHeader.split(' ')[1];
   try {
-    const secret = process.env.JWT_SECRET || 'super_pharma_secret_jwt_key_928374982374';
+    const secret = getJwtSecret();
     const decoded = jwt.verify(token, secret) as {
       id: string;
       email: string;

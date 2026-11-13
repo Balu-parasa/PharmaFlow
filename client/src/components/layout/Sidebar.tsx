@@ -59,17 +59,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, setCurrentTab, use
       
       {/* Brand Header */}
       <div className="p-4 sm:p-5 border-b border-slate-800/70 flex items-center justify-between bg-[#08111B]/60">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 flex items-center justify-center flex-shrink-0">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-11 h-11 flex items-center justify-center flex-shrink-0">
             <img 
               src="/pharmaflow-logo.png" 
               alt="Capsulix Logo" 
-              className="w-full h-full object-contain drop-shadow-[0_2px_10px_rgba(14,165,233,0.35)] transition-transform hover:scale-105"
+              className="w-full h-full object-contain drop-shadow-[0_2px_14px_rgba(14,165,233,0.45)] transition-transform duration-300 hover:scale-105"
             />
           </div>
           <div>
-            <h1 className="font-extrabold text-base tracking-tight text-white leading-tight">Capsulix</h1>
-            <p className="text-[10px] text-slate-400 font-medium tracking-tight">Precision Pharmacy, Zero Errors.</p>
+            <h1 className="font-black text-xl tracking-tight text-white leading-tight bg-gradient-to-r from-white via-slate-100 to-slate-300 bg-clip-text text-transparent">
+              Capsulix
+            </h1>
           </div>
         </div>
       </div>

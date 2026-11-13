@@ -1,12 +1,22 @@
+import dotenv from 'dotenv';
+import path from 'path';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), 'server/.env') });
 
 const prisma = new PrismaClient();
 
 async function main() {
+  if (process.env.NODE_ENV === 'production' && !process.env.ALLOW_PRODUCTION_SEED) {
+    console.error('CRITICAL: Seed script was blocked. Destructive database seeding is not permitted in production without ALLOW_PRODUCTION_SEED=true.');
+    process.exit(1);
+  }
+
   console.log('--- Seeding PharmaFlow Database (FEFO Compliant) ---');
 
-  // Clean existing tables
+  // Clean existing tables in dependency order
   await prisma.stockMovement.deleteMany();
   await prisma.auditLog.deleteMany();
   await prisma.saleItem.deleteMany();
@@ -18,6 +28,7 @@ async function main() {
   await prisma.medicine.deleteMany();
   await prisma.supplier.deleteMany();
   await prisma.customer.deleteMany();
+  await prisma.refreshToken.deleteMany();
   await prisma.user.deleteMany();
 
   // 1. Seed Users (Admin, Pharmacist, Cashier)

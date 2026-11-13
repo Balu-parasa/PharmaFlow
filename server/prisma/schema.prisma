@@ -20,11 +20,26 @@ model User {
   sales          Sale[]
   auditLogs      AuditLog[]
   stockMovements StockMovement[]
+  refreshTokens  RefreshToken[]
   createdAt      DateTime        @default(now())
   updatedAt      DateTime        @updatedAt
 
   @@index([email])
   @@index([role])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  tokenHash String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  revoked   Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([tokenHash])
 }
 
 model Customer {
