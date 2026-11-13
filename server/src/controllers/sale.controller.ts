@@ -74,6 +74,8 @@ export const createSale = async (req: AuthRequest, res: Response) => {
     const now = new Date();
 
     // Execute atomic transaction for stock deduction & sale generation
+    // Configured with explicit timeout (15000ms) and maxWait (5000ms) to ensure resilience
+    // over pooled cloud database connections (e.g. Neon PostgreSQL) across network roundtrips.
     const saleResult = await prisma.$transaction(async (tx) => {
       // 1. Resolve or create customer if phone provided
       let finalCustomerId = customerId;
@@ -334,6 +336,9 @@ export const createSale = async (req: AuthRequest, res: Response) => {
       });
 
       return sale;
+    }, {
+      maxWait: 5000, // Maximum time Prisma Client waits to acquire transaction from pool
+      timeout: 15000  // Maximum time allowed for interactive transaction queries to complete
     });
 
     res.status(201).json({
@@ -443,6 +448,9 @@ export const returnSale = async (req: AuthRequest, res: Response) => {
       });
 
       return { saleId: id, status: newStatus, totalReturned, totalSold };
+    }, {
+      maxWait: 5000,
+      timeout: 15000
     });
 
     res.json({ success: true, message: 'Return processed and inventory restocked', data: returnResult });

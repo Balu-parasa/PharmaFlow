@@ -184,6 +184,9 @@ export const createPurchaseOrder = async (req: AuthRequest, res: Response) => {
         ...po,
         batches: createdBatches
       };
+    }, {
+      maxWait: 5000,
+      timeout: 15000
     });
 
     res.status(201).json({

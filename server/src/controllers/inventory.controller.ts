@@ -110,6 +110,9 @@ export const addBatch = async (req: AuthRequest, res: Response) => {
       });
 
       return b;
+    }, {
+      maxWait: 5000,
+      timeout: 15000
     });
 
     res.status(201).json({ success: true, message: 'Stock batch added successfully', data: batch });
@@ -184,6 +187,9 @@ export const adjustStock = async (req: AuthRequest, res: Response) => {
       });
 
       return b;
+    }, {
+      maxWait: 5000,
+      timeout: 15000
     });
 
     res.json({ success: true, message: 'Stock adjusted successfully', data: updated });
